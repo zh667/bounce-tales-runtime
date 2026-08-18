@@ -21,7 +21,7 @@ Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong 
 
 | Phase | Desktop | Phone |
 | --- | --- | --- |
-| Now | Load user JAR, start original `RMIDlet` | Original JAR + J2ME Loader |
+| Now | Host JAR in the repo root; load user JAR from `assets/` | Original JAR + J2ME Loader |
 | Next | Fill missing MIDP/Nokia methods until menus and chapters run | Still JAR in J2ME Loader |
 | Later | Same host packaged as a desktop jar | Android Gradle APK that loads a user JAR |
 | Not now | — | iOS / IPA |

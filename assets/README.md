@@ -8,7 +8,7 @@ This directory is gitignored except for this README and `.gitkeep`.
 
 1. Copy a legally obtained Bounce Tales `.jar` into this folder.
 2. Keep only one Bounce Tales package here (other `.jar` files make the loader ask you to choose).
-3. Run:
+3. Double-click `..\bounce-tales-runtime.jar` (Java 17+), or run:
 
 ```powershell
 .\gradlew.bat :runtime-pc:run
@@ -20,9 +20,7 @@ Or point at another folder:
 .\gradlew.bat :runtime-pc:run --args="--assets D:\games\bounce"
 ```
 
-The window should start the original MIDlet. Git will not stage the `.jar`. Do not upload this file to GitHub.
-
-You can also build `.\gradlew.bat :runtime-pc:desktopJar` and place the original JAR next to `bounce-tales-runtime.jar`.
+The window should start the original MIDlet. Git will not stage the original `.jar`. Do not upload that file to GitHub. The host JAR at the repo root is ours and is supposed to be public.
 
 Expected local inputs (do not commit):
 

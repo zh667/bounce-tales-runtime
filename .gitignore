@@ -22,6 +22,7 @@ assets/**
 !assets/README.md
 !assets/.gitkeep
 
-# Keep the wrapper jar only.
+# Keep the wrapper and the public host JAR only. Never commit the original game.
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+!/bounce-tales-runtime.jar

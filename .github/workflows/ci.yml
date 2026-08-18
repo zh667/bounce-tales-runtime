@@ -25,4 +25,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Test
-        run: ./gradlew test :runtime-pc:desktopJar --no-daemon
+        run: ./gradlew check --no-daemon

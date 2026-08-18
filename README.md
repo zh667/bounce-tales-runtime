@@ -4,7 +4,7 @@ Unofficial **MIDlet host** for a legally obtained Bounce Tales JAR. Desktop now;
 
 This repository is **not** Bounce Tales, not a Nokia/Rovio product, and does not ship original game assets. You must supply a legally obtained original JAR locally. See [LEGAL.md](LEGAL.md).
 
-Current status: with a local original JAR, the desktop host loads that JAR and starts the original `RMIDlet`. Menus and chapters come from the original bytecode. You can also build a double-clickable `bounce-tales-runtime.jar` (it never embeds the original game).
+Current status: clone this repo, drop a legally obtained original JAR into `assets/`, and double-click the committed `bounce-tales-runtime.jar` (Java 17+). The host never embeds the original game.
 
 ## Goals
 
@@ -22,6 +22,7 @@ j2me-api/          original MIDP / Nokia / MMAPI / RMS shims
 game-logic/        JAR catalog and optional debug overlay parsers
 runtime-pc/        desktop host (classloader + 240×320 window, scaled 2×)
 runtime-android/   APK host later; JVM stub for now
+bounce-tales-runtime.jar  host fat JAR (no original game)
 assets/            local original JAR only; gitignored
 docs/              architecture, roadmap, contributor rules
 ```
@@ -33,30 +34,47 @@ docs/              architecture, roadmap, contributor rules
 
 Java 26 can compile the skeleton with `--release 17`, but CI and `./gradlew` are specified against **JDK 17**.
 
+## Play after clone
+
+The repository includes the **host** JAR (`bounce-tales-runtime.jar`). It does not include Bounce Tales.
+
+1. Install Java 17 or newer (double-click needs `javaw` associated with `.jar`).
+2. Copy a legally obtained Bounce Tales `.jar` into `assets/` (gitignored; do not commit it).
+3. Double-click `bounce-tales-runtime.jar` in the repo root.
+
+```text
+bounce-tales-runtime/
+  bounce-tales-runtime.jar   ← host (this repo)
+  assets/
+    bounce-tales.jar         ← your original game (local only)
+```
+
+If double-click does nothing:
+
+```powershell
+java -jar bounce-tales-runtime.jar
+```
+
 ## Commands
 
 ```bash
-./gradlew test
+./gradlew check
 ./gradlew :runtime-pc:run
-./gradlew :runtime-pc:desktopJar
+./gradlew :runtime-pc:syncHostJar
 ```
 
 Windows:
 
 ```powershell
-.\gradlew.bat test
+.\gradlew.bat check
 .\gradlew.bat :runtime-pc:run
 .\gradlew.bat :runtime-pc:run --args="--headless"
-.\gradlew.bat :runtime-pc:desktopJar
+.\gradlew.bat :runtime-pc:syncHostJar
 ```
 
-产出：`runtime-pc\build\libs\bounce-tales-runtime.jar`。把合法取得的 Bounce Tales `.jar` 放到它旁边，或放到旁边的 `assets/` 文件夹，然后双击宿主 JAR（本机需已安装 Java 17+）。也可以：
+`:runtime-pc:run` is the source-tree path (same `assets/` folder). After you change host code, run `syncHostJar` and commit the updated root `bounce-tales-runtime.jar` so clones stay current. CI fails if that file does not match a fresh build.
 
-```powershell
-java -jar runtime-pc\build\libs\bounce-tales-runtime.jar
-```
-
-仓库开发仍可用 `:runtime-pc:run`（把原版 JAR 放在 gitignored 的 `assets/`）。`--assets <目录>`、`-Dbounce.assets.dir=`、`BOUNCE_ASSETS_DIR` 仍然有效。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
+`--assets <目录>`、`-Dbounce.assets.dir=`、`BOUNCE_ASSETS_DIR` 仍然有效。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
 
 `--debug-overlay` 已移除；没有原版 JAR 时会弹出说明窗口，而不是旧的碰撞预览。
 
