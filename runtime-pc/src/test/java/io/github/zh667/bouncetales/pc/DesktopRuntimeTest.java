@@ -95,6 +95,7 @@ class UiTextTest {
         assertTrue(zh.workbenchHint().contains("MIDI"));
         assertTrue(zh.chapterHint().contains("跳跃"));
         assertTrue(zh.chapterLine(null).contains("bf"));
+        assertTrue(zh.midletFailed("boom").contains("boom"));
         assertTrue(zh.imageEmpty().contains("assets"));
     }
 

@@ -1,27 +1,28 @@
 # bounce-tales-runtime
 
-Unofficial desktop + Android **runtime scaffold** for a Bounce Tales-compatible client.
+Unofficial **MIDlet host** for a legally obtained Bounce Tales JAR. Desktop now; Android APK later.
 
 This repository is **not** Bounce Tales, not a Nokia/Rovio product, and does not ship original game assets. You must supply a legally obtained original JAR locally. See [LEGAL.md](LEGAL.md).
 
-Current status: with a local original JAR, the desktop host loads **Misty Morning** (`bf`), draws terrain as a debug overlay, and lets a ball walk/jump on that collision. Enemies, eggs, trampolines, and menus are not simulated yet.
+Current status: with a local original JAR, the desktop host loads that JAR and starts the original `RMIDlet`. Menus and chapters come from the original bytecode. The older Misty Morning debug overlay is still in the tree (`--debug-overlay`) but is not the product.
 
 ## Goals
 
-1. Keep game rules in `game-logic` (JVM, no UI).
-2. Run that logic on desktop via `runtime-pc`.
-3. Later wrap the same logic as an Android APK via `runtime-android`.
+1. Host the original MIDlet. Do not reimplement chapters, physics, or enemies.
+2. Provide original J2ME / Nokia LCDUI, MIDI, and RMS shims in `j2me-api`.
+3. Later wrap the same host as an Android APK via `runtime-android`.
 4. Do **not** target iOS until the desktop and Android paths are real.
 
-J2ME as a phone OS is gone. Android play today still works by loading a JAR in [J2ME Loader](https://github.com/nikita36078/J2ME-Loader). This repo exists so later builds can be a native desktop app and an APK without merging two upstream decompilations.
+Until this host can play a full chapter, [J2ME Loader](https://github.com/nikita36078/J2ME-Loader) plus the same local JAR is the working phone path.
 
 ## Layout
 
 ```text
-game-logic/        shared rules, JAR catalog, RLEF/lang parsers, chapter play
-runtime-pc/        Hangar-style AWT host (window, keymap, blit, MIDI, save, overlay)
+j2me-api/          original MIDP / Nokia / MMAPI / RMS shims
+game-logic/        JAR catalog and optional debug overlay parsers
+runtime-pc/        desktop host (classloader + 240×320 window, scaled 2×)
 runtime-android/   APK host later; JVM stub for now
-assets/            local original resources only; gitignored
+assets/            local original JAR only; gitignored
 docs/              architecture, roadmap, contributor rules
 ```
 
@@ -45,20 +46,24 @@ Windows:
 .\gradlew.bat test
 .\gradlew.bat :runtime-pc:run
 .\gradlew.bat :runtime-pc:run --args="--headless"
+.\gradlew.bat :runtime-pc:run --args="--debug-overlay"
 ```
 
-把合法取得的 Bounce Tales `.jar` 放到仓库里的 `assets/`（该目录已被 gitignore），再运行 `:runtime-pc:run`。若 JAR 含关卡条目 `bf`，窗口会进入「薄雾早晨」碰撞预览。也可以 `--assets <目录>` 或 `-Dbounce.assets.dir=`。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
+把合法取得的 Bounce Tales `.jar` 放到仓库里的 `assets/`（该目录已被 gitignore），再运行 `:runtime-pc:run`。宿主会加载 JAR 并启动原版 MIDlet。也可以 `--assets <目录>` 或 `-Dbounce.assets.dir=`。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
 
-默认界面为简体中文（系统语言为 `en` 时用英文）。进关后的键位：
+默认界面为简体中文（系统语言为 `en` 时用英文）。原版游戏键位：
 
-| 按键 | 动作 |
+| 按键 | 发给游戏 |
 | --- | --- |
-| ↑ / W / Enter | 跳跃 |
-| ↓ / S | 播放 / 暂停 MIDI |
-| ← / A | 向左 |
-| → / D | 向右 |
-| Backspace | 重生并写入存档槽 |
-| Q | 下一张 JAR 内 PNG（工作台模式） |
+| ↑ / W | 上 |
+| ↓ / S | 下 |
+| ← / A | 左 |
+| → / D | 右 |
+| Enter | 确认 / FIRE |
+| Backspace / Esc | 返回 |
+| Q | 星号 |
+
+`--debug-overlay` 仍打开以前的关卡碰撞预览，不是默认窗口。
 
 Fallback if Gradle cannot start on a too-new JDK:
 

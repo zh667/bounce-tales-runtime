@@ -7,7 +7,7 @@ This project is set up for **multi-person work**. Code does not go to `main` exc
 Open an issue before writing code, unless the change is a typo in docs you already own.
 
 - Bug: use the Bug report template. Include OS, JDK, module, and how to reproduce.
-- Feature: use the Feature request template. Describe the user-visible result and the module (`game-logic` / `runtime-pc` / `runtime-android`).
+- Feature: use the Feature request template. Describe the user-visible result and the module (`game-logic` / `j2me-api` / `runtime-pc` / `runtime-android`).
 
 Wait until the issue is triaged if the change is large, legal-sensitive, or touches assets.
 

@@ -4,45 +4,53 @@
 
 Do not merge HelloOO7/BounceTales and Wafer-EX/BounceTalesReversed into one git tree. They are independent decompilations with different hosts, build systems, and license postures.
 
-This repo is a **new runtime**:
+This repo is a **MIDlet host**, not a remake:
 
-- `game-logic` owns rules, simulation, and later file-format readers.
-- `runtime-pc` owns window, keyboard, audio, and saves.
+- `j2me-api` owns original package names the game already links against (`javax.microedition.*`, `com.nokia.mid.ui`).
+- `runtime-pc` loads the user JAR with a classloader, sets Nokia platform properties, and starts `MIDlet-1`.
+- `game-logic` may still parse JAR catalogs / RLEF for debug tools. It must not import `javax.microedition.*`.
 - `runtime-android` owns the future APK host.
 
-Upstream clones stay outside this repository and are used as behavior oracles.
+Upstream clones stay outside this repository and are used as behavior oracles. Do not copy Wafer-EX or HelloOO7 sources.
 
-## Why three modules
+## Why these modules
 
-Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong in a host, not in shared rules. Desktop uses a **Hangar-style AWT host** (one `JFrame`, keymap, later LCDUI shims). Jademula was not chosen: the HelloOO7 tree expects NetBeans + S40 SDK, and the local `Jademula` checkout is empty. Android can use a J2ME loader embed or a rewritten renderer. Shared code should not import `javax.microedition.*` unless an issue explicitly accepts that dependency.
+Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong in `j2me-api`, not in shared rules. Desktop uses a **Hangar-style AWT host** (one `JFrame`, keymap, LCDUI blit). Jademula was not chosen: the HelloOO7 tree expects NetBeans + S40 SDK. Android can later embed the same shims. `game-logic` stays free of MIDP types.
 
 ## Host strategy
 
 | Phase | Desktop | Phone |
 | --- | --- | --- |
-| Now | Hangar-style AWT: Misty Morning overlay + ball on RLEF terrain | Original JAR + J2ME Loader |
-| Next | Enough logic to enter a chapter | Still JAR in J2ME Loader |
-| Later | Same `game-logic` in a desktop jar | Android Gradle APK |
-| Not now | — | iOS / IPA (needs a native rewrite) |
+| Now | Load user JAR, start original `RMIDlet` | Original JAR + J2ME Loader |
+| Next | Fill missing MIDP/Nokia methods until menus and chapters run | Still JAR in J2ME Loader |
+| Later | Same host packaged as a desktop jar | Android Gradle APK that loads a user JAR |
+| Not now | — | iOS / IPA |
 
 ## Data flow
 
 ```text
 user JAR (local, gitignored `assets/`)
-    -> AssetLocator reads manifest + entry names
-    -> JarCatalog lists PNG / MIDI / lang.* / packed index `a` / campaign `bf`
-    -> ChapterLoader reads RLEF; ChapterPlay collides with geometry
-    -> runtime-pc draws a debug overlay and follows the ball
+    -> MidletManifest reads MIDlet-1
+    -> URLClassLoader (parent = host, so javax.* come from j2me-api)
+    -> microedition.platform = NokiaN73 (must match manifest Nokia-Platform: Nokia*)
+    -> RMIDlet.startApp()
+    -> GameCanvas buffer blit at 240×320, window scaled 2×
 ```
+
+The ChapterPlay overlay is a leftover prototype. It is not the default window.
+
+## Platform check
+
+Original `StringManager` reads `/META-INF/MANIFEST.MF` `Nokia-Platform:` and compares it to `microedition.platform`. A mismatch calls `System.exit(0)`. Do not set `microedition.platform=PC`. `getAppProperty` must return **manifest** keys, not `System.getProperty`.
 
 ## What HelloOO7 is for
 
-Readable class structure, resource composer, Nokia S40 packaging, Jademula Windows notes, debug overlay ideas.
+Readable class structure, resource composer, Nokia S40 packaging, Jademula Windows notes.
 
 ## What Wafer-EX is for
 
-Gradle desktop layout, original keyboard table, save/MIDI ideas. This repo’s keymap is a new implementation: arrows **and WASD**, Backspace for Back (not `2`), Q for Star.
+Gradle desktop layout, original keyboard table, save/MIDI ideas. This repo’s keymap is a new implementation: arrows **and WASD**, Backspace for Back (not `2`), Q for Star. Do not copy their LCDUI shims.
 
 ## What this repo must not become
 
-A re-upload of either upstream tree, or a public dump of Nokia/Rovio assets.
+A re-upload of either upstream tree, or a public dump of Nokia/Rovio assets (including the original game JAR).
