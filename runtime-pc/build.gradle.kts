@@ -12,3 +12,7 @@ dependencies {
 application {
     mainClass.set("io.github.zh667.bouncetales.pc.DesktopRuntime")
 }
+
+tasks.named<JavaExec>("run") {
+    systemProperty("bounce.debug.dump", System.getProperty("bounce.debug.dump", "false"))
+}

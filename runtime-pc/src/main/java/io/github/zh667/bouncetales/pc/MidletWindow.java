@@ -10,6 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.imageio.ImageIO;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.midlet.DisplayBridge;
@@ -26,6 +31,7 @@ final class MidletWindow implements DisplayBridge {
     private final JFrame frame;
     private final View view;
     private volatile Canvas canvas;
+    private final AtomicBoolean dumped = new AtomicBoolean();
 
     MidletWindow(String title) {
         frame = new JFrame(title);
@@ -64,6 +70,11 @@ final class MidletWindow implements DisplayBridge {
     void show() {
         frame.setVisible(true);
         view.requestFocusInWindow();
+        if (Boolean.parseBoolean(System.getProperty("bounce.debug.dump", "false"))) {
+            javax.swing.Timer timer = new javax.swing.Timer(5000, event -> dumpFrame());
+            timer.setRepeats(false);
+            timer.start();
+        }
     }
 
     void dispose() {
@@ -98,6 +109,28 @@ final class MidletWindow implements DisplayBridge {
     @Override
     public int height() {
         return LOGICAL_HEIGHT;
+    }
+
+    private void dumpFrame() {
+        if (!dumped.compareAndSet(false, true)) {
+            return;
+        }
+        Canvas current = canvas;
+        if (!(current instanceof GameCanvas game)) {
+            return;
+        }
+        try {
+            String dir = System.getProperty("bounce.save.dir");
+            Path root = (dir == null || dir.isBlank())
+                    ? Path.of(System.getProperty("user.home"), ".bounce-tales-runtime")
+                    : Path.of(dir);
+            Files.createDirectories(root);
+            Path out = root.resolve("frame-dump.png");
+            ImageIO.write(game.buffer(), "png", out.toFile());
+            System.out.println("debug dump: " + out.toAbsolutePath());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private final class View extends JPanel {
