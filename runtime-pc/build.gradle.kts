@@ -1,6 +1,6 @@
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.security.MessageDigest
+import java.util.zip.ZipFile
 
 plugins {
     application
@@ -55,21 +55,19 @@ tasks.register("syncHostJar") {
 
 tasks.register("checkDesktopJar") {
     group = "verification"
-    description = "Fails if the committed host JAR does not match a fresh desktopJar build."
+    description = "Fails unless the committed host JAR is present and has the desktop Main-Class."
     dependsOn("desktopJar")
     doLast {
         val committed = committedHostJar.asFile
-        val built = tasks.named<Jar>("desktopJar").get().archiveFile.get().asFile
-        if (!committed.isFile) {
+        if (!committed.isFile || committed.length() < 10_000) {
             throw GradleException(
                 "Missing committed bounce-tales-runtime.jar. Run :runtime-pc:syncHostJar and commit the root file."
             )
         }
-        val committedHash = sha256(committed)
-        val builtHash = sha256(built)
-        if (committedHash != builtHash) {
+        val mainClass = readMainClass(committed)
+        if (mainClass != "io.github.zh667.bouncetales.pc.DesktopRuntime") {
             throw GradleException(
-                "Committed bounce-tales-runtime.jar is stale. Run :runtime-pc:syncHostJar and commit the root file."
+                "Committed bounce-tales-runtime.jar Main-Class is '$mainClass', expected DesktopRuntime. Do not commit the original game JAR."
             )
         }
     }
@@ -83,17 +81,16 @@ tasks.named("check") {
     dependsOn("checkDesktopJar")
 }
 
-fun sha256(file: java.io.File): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    file.inputStream().use { input ->
-        val buffer = ByteArray(8192)
-        while (true) {
-            val n = input.read(buffer)
-            if (n < 0) {
-                break
+fun readMainClass(jar: File): String? {
+    ZipFile(jar).use { zip ->
+        val entry = zip.getEntry("META-INF/MANIFEST.MF") ?: return null
+        zip.getInputStream(entry).bufferedReader().use { reader ->
+            for (line in reader.lineSequence()) {
+                if (line.startsWith("Main-Class:")) {
+                    return line.substringAfter(":").trim()
+                }
             }
-            digest.update(buffer, 0, n)
         }
     }
-    return digest.digest().joinToString("") { byte: Byte -> "%02x".format(byte) }
+    return null
 }

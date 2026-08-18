@@ -72,7 +72,7 @@ Windows:
 .\gradlew.bat :runtime-pc:syncHostJar
 ```
 
-`:runtime-pc:run` is the source-tree path (same `assets/` folder). After you change host code, run `syncHostJar` and commit the updated root `bounce-tales-runtime.jar` so clones stay current. CI fails if that file does not match a fresh build.
+`:runtime-pc:run` is the source-tree path (same `assets/` folder). After you change host code, run `syncHostJar` and commit the updated root `bounce-tales-runtime.jar` so clones stay current. CI checks that file is our host (`Main-Class: DesktopRuntime`), not a byte-for-byte rebuild.
 
 `--assets <目录>`、`-Dbounce.assets.dir=`、`BOUNCE_ASSETS_DIR` 仍然有效。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
 
