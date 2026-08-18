@@ -1,0 +1,41 @@
+name: Feature request
+description: New behavior after an issue is accepted.
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Wait for triage on large or legal-sensitive work before coding.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: What is missing or painful today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      placeholder: User-visible result and which module changes.
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Primary module
+      options:
+        - game-logic
+        - runtime-pc
+        - runtime-android
+        - docs / workflow
+        - unsure
+    validations:
+      required: true
+  - type: checkboxes
+    id: legal
+    attributes:
+      label: Legal check
+      options:
+        - label: This does not require committing original Bounce Tales assets or HelloOO7 sources.
+          required: true

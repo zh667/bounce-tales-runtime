@@ -1,0 +1,30 @@
+# Roadmap
+
+Skeleton complete: module graph, CI, issue/PR workflow, legal boundary.
+
+Work after this commit must go through GitHub Issues.
+
+## Milestone A — desktop host
+
+- Window and keypad/keyboard mapping
+- Evaluate Hangar vs Jademula as the first real host
+- Local asset loader from `assets/` (gitignored)
+- Optional save slot and MIDI (ideas from Wafer-EX, original implementation)
+
+## Milestone B — playable desktop
+
+- `game-logic` implements enough simulation to enter a chapter
+- Debug overlay / collision draw (inspired by HelloOO7, written here)
+- Document how to point BounceComposer at a local JAR
+
+## Milestone C — Android APK
+
+- Convert `runtime-android` to Android Gradle Plugin
+- Load user-supplied assets from device storage
+- Keep producing a JAR for J2ME Loader as long as it remains useful
+
+## Out of scope until C is done
+
+- IPA / App Store
+- Shipping original sprites or music
+- Clean-room full remake under a new game title (separate product if we go that far)

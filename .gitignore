@@ -1,0 +1,27 @@
+.gradle/
+build/
+out/
+bin/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+local.properties
+*.class
+*.log
+.DS_Store
+Thumbs.db
+
+# Original game dumps. Never commit these.
+*.jad
+dump/
+original/
+assets/**
+!assets/README.md
+!assets/.gitkeep
+
+# Keep the wrapper jar only.
+*.jar
+!gradle/wrapper/gradle-wrapper.jar

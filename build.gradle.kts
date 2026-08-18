@@ -1,0 +1,21 @@
+plugins {
+    java
+}
+
+subprojects {
+    apply(plugin = "java")
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+}

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Legal / original assets
+    url: https://github.com/zh667/bounce-tales-runtime/blob/main/LEGAL.md
+    about: Do not attach original JAR, sprites, or MIDI to issues.
