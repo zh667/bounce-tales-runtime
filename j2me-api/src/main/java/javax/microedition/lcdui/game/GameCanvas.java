@@ -13,10 +13,15 @@ public class GameCanvas extends Canvas {
     public static final int FIRE_PRESSED = 1 << Canvas.FIRE;
 
     private final BufferedImage buffer;
+    private final BufferedImage present;
     private final Graphics graphics;
+    private final Object presentLock = new Object();
 
     public GameCanvas(boolean suppressKeyEvents) {
-        buffer = new BufferedImage(Math.max(1, getWidth()), Math.max(1, getHeight()), BufferedImage.TYPE_INT_ARGB);
+        int width = Math.max(1, getWidth());
+        int height = Math.max(1, getHeight());
+        buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        present = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         java.awt.Graphics2D g2 = buffer.createGraphics();
         g2.setComposite(java.awt.AlphaComposite.SrcOver);
         graphics = new Graphics(g2);
@@ -27,15 +32,29 @@ public class GameCanvas extends Canvas {
     }
 
     public void flushGraphics() {
+        synchronized (presentLock) {
+            java.awt.Graphics g = present.getGraphics();
+            g.drawImage(buffer, 0, 0, null);
+            g.dispose();
+        }
         Display.getDisplay(null).flush();
     }
 
     @Override
     protected void paint(Graphics g) {
-        g.g2.drawImage(buffer, 0, 0, null);
+        synchronized (presentLock) {
+            g.g2.drawImage(present, 0, 0, null);
+        }
     }
 
     public BufferedImage buffer() {
         return buffer;
+    }
+
+    /** Last completed frame. Safe for the EDT to blit while the game draws the back buffer. */
+    public void blitPresent(java.awt.Graphics g, int dx, int dy, int dw, int dh) {
+        synchronized (presentLock) {
+            g.drawImage(present, dx, dy, dw, dh, null);
+        }
     }
 }
