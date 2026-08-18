@@ -70,6 +70,7 @@ final class MidletWindow implements DisplayBridge {
     void show() {
         frame.setVisible(true);
         view.requestFocusInWindow();
+        HostLog.windowOpened(LOGICAL_WIDTH, LOGICAL_HEIGHT, SCALE);
         if (Boolean.parseBoolean(System.getProperty("bounce.debug.dump", "false"))) {
             javax.swing.Timer timer = new javax.swing.Timer(5000, event -> dumpFrame());
             timer.setRepeats(false);
@@ -94,11 +95,8 @@ final class MidletWindow implements DisplayBridge {
 
     @Override
     public void flush() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            view.repaint();
-        } else {
-            view.repaint();
-        }
+        HostLog.flush();
+        view.repaint();
     }
 
     @Override
@@ -126,7 +124,12 @@ final class MidletWindow implements DisplayBridge {
                     : Path.of(dir);
             Files.createDirectories(root);
             Path out = root.resolve("frame-dump.png");
-            ImageIO.write(game.buffer(), "png", out.toFile());
+            BufferedImage shot =
+                    new BufferedImage(LOGICAL_WIDTH, LOGICAL_HEIGHT, BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics g = shot.createGraphics();
+            game.blitPresent(g, 0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+            g.dispose();
+            ImageIO.write(shot, "png", out.toFile());
             System.out.println("debug dump: " + out.toAbsolutePath());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -137,24 +140,23 @@ final class MidletWindow implements DisplayBridge {
         private View() {
             setPreferredSize(new Dimension(LOGICAL_WIDTH * SCALE, LOGICAL_HEIGHT * SCALE));
             setBackground(Color.BLACK);
+            setOpaque(true);
         }
 
         @Override
         protected void paintComponent(Graphics graphics) {
-            super.paintComponent(graphics);
+            HostLog.paint();
             Canvas current = canvas;
-            if (current == null) {
-                return;
-            }
             Graphics2D g = (Graphics2D) graphics.create();
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
             if (current instanceof GameCanvas game) {
-                BufferedImage buffer = game.buffer();
-                g.drawImage(buffer, 0, 0, getWidth(), getHeight(), null);
-            } else {
+                game.blitPresent(g, 0, 0, getWidth(), getHeight());
+            } else if (current != null) {
                 BufferedImage scratch = new BufferedImage(LOGICAL_WIDTH, LOGICAL_HEIGHT, BufferedImage.TYPE_INT_RGB);
                 current.dispatchPaint(new javax.microedition.lcdui.Graphics(scratch.createGraphics()));
                 g.drawImage(scratch, 0, 0, getWidth(), getHeight(), null);
+            } else {
+                super.paintComponent(g);
             }
             g.dispose();
         }

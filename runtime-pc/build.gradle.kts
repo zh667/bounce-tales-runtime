@@ -15,4 +15,5 @@ application {
 
 tasks.named<JavaExec>("run") {
     systemProperty("bounce.debug.dump", System.getProperty("bounce.debug.dump", "false"))
+    systemProperty("bounce.debug.host", System.getProperty("bounce.debug.host", "true"))
 }
