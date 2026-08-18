@@ -14,14 +14,14 @@ Upstream clones stay outside this repository and are used as behavior oracles.
 
 ## Why three modules
 
-Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong in a host, not in shared rules. Desktop can use Hangar- or Jademula-style shims; Android can use a J2ME loader embed or a rewritten renderer. Shared code should not import `javax.microedition.*` unless an issue explicitly accepts that dependency.
+Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong in a host, not in shared rules. Desktop uses a **Hangar-style AWT host** (one `JFrame`, keymap, later LCDUI shims). Jademula was not chosen: the HelloOO7 tree expects NetBeans + S40 SDK, and the local `Jademula` checkout is empty. Android can use a J2ME loader embed or a rewritten renderer. Shared code should not import `javax.microedition.*` unless an issue explicitly accepts that dependency.
 
 ## Host strategy
 
 | Phase | Desktop | Phone |
 | --- | --- | --- |
-| Now | JVM stub (`:runtime-pc:run`) | Original JAR + J2ME Loader |
-| Next | Real window + input + optional MIDI/save ideas from Wafer-EX | Still JAR in J2ME Loader |
+| Now | Hangar-style AWT window + keymap (`:runtime-pc:run`) | Original JAR + J2ME Loader |
+| Next | Load local `assets/`, then MIDI/save | Still JAR in J2ME Loader |
 | Later | Same `game-logic` in a desktop jar | Android Gradle APK |
 | Not now | — | iOS / IPA (needs a native rewrite) |
 
@@ -40,7 +40,7 @@ Readable class structure, resource composer, Nokia S40 packaging, Jademula Windo
 
 ## What Wafer-EX is for
 
-Gradle desktop layout, keyboard map, save progress, MIDI playback, Hangar emulator as a host candidate.
+Gradle desktop layout, original keyboard table, save/MIDI ideas. This repo’s keymap is a new implementation: arrows **and WASD**, Backspace for Back (not `2`), Q for Star.
 
 ## What this repo must not become
 

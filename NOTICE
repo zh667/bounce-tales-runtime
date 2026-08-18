@@ -12,5 +12,8 @@ Third-party study references (not vendored in this repository):
 
 - HelloOO7/BounceTales — no license file; treat as all rights reserved
 - Wafer-EX/BounceTalesReversed — Apache License 2.0 for that author's code
+- Hangar Emulator (https://github.com/Lisowolf/HangarEmulator) — studied as the
+  desktop-host pattern (AWT frame + key mapping). This repository contains an
+  original implementation, not a copy of Hangar or Wafer-EX sources.
 - Gradle Wrapper files originated from the Gradle project / a Gradle-based
   reference build and are used under Apache License 2.0
