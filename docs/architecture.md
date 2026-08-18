@@ -20,7 +20,7 @@ Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong 
 
 | Phase | Desktop | Phone |
 | --- | --- | --- |
-| Now | Hangar-style AWT: keymap, JAR inventory, PNG blit, MIDI, save slot, ball preview | Original JAR + J2ME Loader |
+| Now | Hangar-style AWT: Misty Morning overlay + ball on RLEF terrain | Original JAR + J2ME Loader |
 | Next | Enough logic to enter a chapter | Still JAR in J2ME Loader |
 | Later | Same `game-logic` in a desktop jar | Android Gradle APK |
 | Not now | — | iOS / IPA (needs a native rewrite) |
@@ -30,9 +30,9 @@ Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong 
 ```text
 user JAR (local, gitignored `assets/`)
     -> AssetLocator reads manifest + entry names
-    -> JarCatalog lists PNG / MIDI / lang.* / packed index `a`
-    -> runtime-pc blits images, plays MIDI, writes SaveStore
-    -> game-logic parses lang + packed index; BallSim is a placeholder, not a chapter
+    -> JarCatalog lists PNG / MIDI / lang.* / packed index `a` / campaign `bf`
+    -> ChapterLoader reads RLEF; ChapterPlay collides with geometry
+    -> runtime-pc draws a debug overlay and follows the ball
 ```
 
 ## What HelloOO7 is for

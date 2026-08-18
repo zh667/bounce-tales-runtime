@@ -20,18 +20,25 @@ public final class JarCatalog {
     private final List<String> midis;
     private final List<String> langs;
     private final boolean hasPackedIndex;
+    private final boolean hasCampaign01;
 
     private JarCatalog(
-            Path jar, List<String> images, List<String> midis, List<String> langs, boolean hasPackedIndex) {
+            Path jar,
+            List<String> images,
+            List<String> midis,
+            List<String> langs,
+            boolean hasPackedIndex,
+            boolean hasCampaign01) {
         this.jar = jar;
         this.images = List.copyOf(images);
         this.midis = List.copyOf(midis);
         this.langs = List.copyOf(langs);
         this.hasPackedIndex = hasPackedIndex;
+        this.hasCampaign01 = hasCampaign01;
     }
 
     public static JarCatalog empty() {
-        return new JarCatalog(null, List.of(), List.of(), List.of(), false);
+        return new JarCatalog(null, List.of(), List.of(), List.of(), false, false);
     }
 
     public static JarCatalog open(Path jar) throws IOException {
@@ -40,6 +47,7 @@ public final class JarCatalog {
         List<String> midis = new ArrayList<>();
         List<String> langs = new ArrayList<>();
         boolean packed = false;
+        boolean campaign = false;
         try (JarFile jarFile = new JarFile(jar.toFile())) {
             var entries = jarFile.entries();
             while (entries.hasMoreElements()) {
@@ -57,13 +65,15 @@ public final class JarCatalog {
                     langs.add(name);
                 } else if (lower.equals("a")) {
                     packed = true;
+                } else if (lower.equals(ChapterId.MISTY_MORNING.jarEntry())) {
+                    campaign = true;
                 }
             }
         }
         images.sort(Comparator.naturalOrder());
         midis.sort(Comparator.naturalOrder());
         langs.sort(Comparator.naturalOrder());
-        return new JarCatalog(jar, images, midis, langs, packed);
+        return new JarCatalog(jar, images, midis, langs, packed, campaign);
     }
 
     public Optional<Path> jar() {
@@ -86,6 +96,10 @@ public final class JarCatalog {
         return hasPackedIndex;
     }
 
+    public boolean hasCampaign01() {
+        return hasCampaign01;
+    }
+
     public Optional<String> preferredLang() {
         for (String name : langs) {
             if (name.equalsIgnoreCase("lang.zh-CN") || name.equalsIgnoreCase("lang.zh_cn")) {
@@ -101,7 +115,7 @@ public final class JarCatalog {
     }
 
     public boolean hasMedia() {
-        return !images.isEmpty() || !midis.isEmpty() || !langs.isEmpty() || hasPackedIndex;
+        return !images.isEmpty() || !midis.isEmpty() || !langs.isEmpty() || hasPackedIndex || hasCampaign01;
     }
 
     public String toLogLine() {
@@ -112,7 +126,9 @@ public final class JarCatalog {
                 + " lang="
                 + langs.size()
                 + " packedIndex="
-                + hasPackedIndex;
+                + hasPackedIndex
+                + " campaign01="
+                + hasCampaign01;
     }
 
     private static String stripLeadingSlash(String name) {

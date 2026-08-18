@@ -1,8 +1,11 @@
 package io.github.zh667.bouncetales.pc;
 
 import io.github.zh667.bouncetales.logic.AssetInventory;
+import io.github.zh667.bouncetales.logic.ChapterId;
+import io.github.zh667.bouncetales.logic.ChapterPlay;
 import io.github.zh667.bouncetales.logic.GameAction;
 import io.github.zh667.bouncetales.logic.PackedKind;
+import io.github.zh667.bouncetales.logic.RlefLevel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -148,6 +151,22 @@ final class UiText {
 
     String workbenchHint() {
         return text("media.hint");
+    }
+
+    String chapterHint() {
+        return text("chapter.hint");
+    }
+
+    String chapterLine(ChapterPlay play) {
+        if (play == null) {
+            return text("chapter.none");
+        }
+        RlefLevel level = play.level();
+        return String.format(
+                text("chapter.line"),
+                ChapterId.MISTY_MORNING.slug(),
+                level.terrain().size(),
+                level.markers().size());
     }
 
     private String midiStatus(MidiPlayer.Status status) {

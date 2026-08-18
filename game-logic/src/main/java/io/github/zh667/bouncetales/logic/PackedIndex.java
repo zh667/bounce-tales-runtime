@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Packed resource index (JAR entry {@code a}): file table, batches, resident headers.
@@ -110,6 +111,20 @@ public final class PackedIndex {
     public long countKind(PackedKind kind) {
         PackedKind wanted = Objects.requireNonNull(kind, "kind");
         return batches.stream().filter(batch -> batch.kind() == wanted).count();
+    }
+
+    public Optional<FileRef> findPath(String path) {
+        if (path == null || path.isBlank()) {
+            return Optional.empty();
+        }
+        String wanted = path.startsWith("/") ? path.substring(1) : path;
+        for (FileRef file : files) {
+            String name = file.path().startsWith("/") ? file.path().substring(1) : file.path();
+            if (wanted.equals(name)) {
+                return Optional.of(file);
+            }
+        }
+        return Optional.empty();
     }
 
     public String toLogLine() {
