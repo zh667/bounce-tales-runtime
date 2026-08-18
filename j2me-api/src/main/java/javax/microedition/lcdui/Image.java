@@ -19,7 +19,7 @@ public class Image {
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException();
         }
-        BufferedImage buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         java.awt.Graphics2D g = buf.createGraphics();
         g.setColor(java.awt.Color.WHITE);
         g.fillRect(0, 0, width, height);
@@ -51,22 +51,31 @@ public class Image {
         if (in == null) {
             throw new IOException("image not found: " + name);
         }
-        try (InputStream stream = in) {
+        try (InputStream stream = in instanceof java.io.BufferedInputStream
+                ? in
+                : new java.io.BufferedInputStream(in)) {
             BufferedImage decoded = ImageIO.read(stream);
             if (decoded == null) {
                 throw new IOException("undecodable image: " + name);
             }
-            return new Image(decoded, false);
+            return copyArgb(decoded, false);
         }
     }
 
     public static Image createImage(byte[] imageData, int imageOffset, int imageLength) {
         try {
-            BufferedImage decoded = ImageIO.read(new ByteArrayInputStream(imageData, imageOffset, imageLength));
+            int start = imageOffset;
+            int length = imageLength;
+            int magic = findImageMagic(imageData, imageOffset, imageLength);
+            if (magic >= 0) {
+                start = magic;
+                length = imageOffset + imageLength - magic;
+            }
+            BufferedImage decoded = ImageIO.read(new ByteArrayInputStream(imageData, start, length));
             if (decoded == null) {
                 throw new IllegalArgumentException("undecodable image");
             }
-            return new Image(decoded, false);
+            return copyArgb(decoded, false);
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -100,5 +109,29 @@ public class Image {
 
     public BufferedImage awtImage() {
         return raster;
+    }
+
+    private static Image copyArgb(BufferedImage source, boolean mutable) {
+        BufferedImage argb = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g = argb.createGraphics();
+        g.drawImage(source, 0, 0, null);
+        g.dispose();
+        return new Image(argb, mutable);
+    }
+
+    /** Packed slices sometimes have a few bytes before a PNG/JPEG payload. */
+    static int findImageMagic(byte[] data, int offset, int length) {
+        int end = Math.min(data.length, offset + length) - 2;
+        for (int i = offset; i <= end; i++) {
+            int b0 = data[i] & 0xFF;
+            int b1 = data[i + 1] & 0xFF;
+            if (b0 == 0x89 && i + 3 < offset + length && b1 == 0x50 && (data[i + 2] & 0xFF) == 0x4E && (data[i + 3] & 0xFF) == 0x47) {
+                return i;
+            }
+            if (b0 == 0xFF && b1 == 0xD8) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

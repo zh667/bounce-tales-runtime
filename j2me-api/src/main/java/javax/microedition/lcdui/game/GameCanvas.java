@@ -16,8 +16,10 @@ public class GameCanvas extends Canvas {
     private final Graphics graphics;
 
     public GameCanvas(boolean suppressKeyEvents) {
-        buffer = new BufferedImage(Math.max(1, getWidth()), Math.max(1, getHeight()), BufferedImage.TYPE_INT_RGB);
-        graphics = new Graphics(buffer.createGraphics());
+        buffer = new BufferedImage(Math.max(1, getWidth()), Math.max(1, getHeight()), BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g2 = buffer.createGraphics();
+        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+        graphics = new Graphics(g2);
     }
 
     protected Graphics getGraphics() {

@@ -169,10 +169,51 @@ public class Graphics {
         if (src == null || width <= 0 || height <= 0) {
             return;
         }
-        BufferedImage region = src.raster.getSubimage(xSrc, ySrc, width, height);
+        int sx = xSrc;
+        int sy = ySrc;
+        int sw = width;
+        int sh = height;
+        int dx = xDest;
+        int dy = yDest;
+        if (sx < 0) {
+            sw += sx;
+            dx -= sx;
+            sx = 0;
+        }
+        if (sy < 0) {
+            sh += sy;
+            dy -= sy;
+            sy = 0;
+        }
+        if (sx + sw > src.getWidth()) {
+            sw = src.getWidth() - sx;
+        }
+        if (sy + sh > src.getHeight()) {
+            sh = src.getHeight() - sy;
+        }
+        if (sw <= 0 || sh <= 0) {
+            return;
+        }
+        int ax = dx;
+        int ay = dy;
+        if (transform == Sprite.TRANS_NONE) {
+            if ((anchor & HCENTER) != 0) {
+                ax -= sw / 2;
+            } else if ((anchor & RIGHT) != 0) {
+                ax -= sw;
+            }
+            if ((anchor & VCENTER) != 0) {
+                ay -= sh / 2;
+            } else if ((anchor & BOTTOM) != 0) {
+                ay -= sh;
+            }
+            g2.drawImage(src.raster, ax, ay, ax + sw, ay + sh, sx, sy, sx + sw, sy + sh, null);
+            return;
+        }
+        BufferedImage region = copyRegion(src.raster, sx, sy, sw, sh);
         BufferedImage transformed = applyTransform(region, transform);
-        int ax = xDest;
-        int ay = yDest;
+        ax = dx;
+        ay = dy;
         if ((anchor & HCENTER) != 0) {
             ax -= transformed.getWidth() / 2;
         } else if ((anchor & RIGHT) != 0) {
@@ -184,6 +225,15 @@ public class Graphics {
             ay -= transformed.getHeight();
         }
         g2.drawImage(transformed, ax, ay, null);
+    }
+
+    /** Copy pixels instead of {@code getSubimage}; child rasters can blit at the wrong offset. */
+    static BufferedImage copyRegion(BufferedImage src, int x, int y, int width, int height) {
+        BufferedImage copy = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        int[] rgb = new int[width * height];
+        src.getRGB(x, y, width, height, rgb, 0, width);
+        copy.setRGB(0, 0, width, height, rgb, 0, width);
+        return copy;
     }
 
     public void drawRGB(

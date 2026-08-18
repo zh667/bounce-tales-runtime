@@ -1,7 +1,6 @@
 package io.github.zh667.bouncetales.pc;
 
 import io.github.zh667.bouncetales.logic.SaveStore;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.Locale;
@@ -39,7 +38,7 @@ public final class MidletHost {
                 .orElseThrow(() -> new IllegalStateException("JAR has no MIDlet-1"));
         installPlatform(manifest);
         System.setProperty("bounce.save.dir", saves.directory().toString());
-        URLClassLoader loader = new URLClassLoader(new URL[] {jar.toUri().toURL()}, MidletHost.class.getClassLoader());
+        URLClassLoader loader = new MidletClassLoader(jar.toUri().toURL(), MidletHost.class.getClassLoader());
         Thread.currentThread().setContextClassLoader(loader);
         Class<?> type = Class.forName(manifest.midletClass(), true, loader);
         Object instance = type.getDeclaredConstructor().newInstance();

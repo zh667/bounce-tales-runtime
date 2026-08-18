@@ -27,6 +27,20 @@ class ImageTest {
     }
 
     @Test
+    void createImageSkipsBytesBeforePngMagic() throws Exception {
+        byte[] png = pngBytes();
+        byte[] wrapped = new byte[png.length + 4];
+        wrapped[0] = 1;
+        wrapped[1] = 2;
+        wrapped[2] = 3;
+        wrapped[3] = 4;
+        System.arraycopy(png, 0, wrapped, 4, png.length);
+        Image image = Image.createImage(wrapped, 0, wrapped.length);
+        assertEquals(2, image.getWidth());
+        assertEquals(4, Image.findImageMagic(wrapped, 0, wrapped.length));
+    }
+
+    @Test
     void createImageFromClasspathUsesContextClassLoader(@TempDir Path temp) throws Exception {
         Path jar = temp.resolve("pics.jar");
         Manifest manifest = new Manifest();
