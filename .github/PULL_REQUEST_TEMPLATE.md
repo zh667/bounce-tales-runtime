@@ -12,6 +12,7 @@
 ## Module
 
 - [ ] game-logic
+- [ ] j2me-api
 - [ ] runtime-pc
 - [ ] runtime-android
 - [ ] repo / CI

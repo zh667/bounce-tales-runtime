@@ -1,0 +1,26 @@
+package javax.microedition.media;
+
+public interface Player extends Controllable {
+    int UNREALIZED = 100;
+    int REALIZED = 200;
+    int PREFETCHED = 300;
+    int STARTED = 400;
+    int CLOSED = 0;
+
+    void prefetch() throws MediaException;
+
+    void start() throws MediaException;
+
+    void stop() throws MediaException;
+
+    void deallocate();
+
+    void close();
+
+    int getState();
+
+    void setLoopCount(int count);
+
+    @Override
+    Control getControl(String controlType);
+}

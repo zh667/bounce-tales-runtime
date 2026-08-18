@@ -20,7 +20,7 @@ Or point at another folder:
 .\gradlew.bat :runtime-pc:run --args="--assets D:\games\bounce"
 ```
 
-The window should show `已识别` plus MIDlet name, version, and entry count. Git will not stage the `.jar`.
+The window should start the original MIDlet (menus from the JAR, not the debug overlay). Git will not stage the `.jar`. Do not upload this file to GitHub.
 
 Expected local inputs (do not commit):
 

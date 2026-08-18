@@ -157,6 +157,10 @@ final class UiText {
         return text("chapter.hint");
     }
 
+    String midletFailed(String detail) {
+        return String.format(text("midlet.failed"), detail == null ? "?" : detail);
+    }
+
     String chapterLine(ChapterPlay play) {
         if (play == null) {
             return text("chapter.none");
