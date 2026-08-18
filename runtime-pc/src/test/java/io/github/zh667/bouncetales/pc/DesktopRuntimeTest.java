@@ -23,7 +23,7 @@ class DesktopRuntimeTest {
 
     @Test
     void bannerNamesSharedLogic() {
-        assertTrue(DesktopRuntime.banner().contains("game-logic/skeleton"));
+        assertTrue(DesktopRuntime.banner().contains("game-logic/preview"));
     }
 
     @Test
@@ -92,6 +92,8 @@ class UiTextTest {
         assertTrue(zh.binding(GameAction.BACK).contains("Backspace"));
         assertTrue(zh.assetsStatus(AssetInventory.empty(Path.of("assets"))).contains("Bounce Tales"));
         assertEquals("资源", zh.assetsHeading());
+        assertTrue(zh.workbenchHint().contains("MIDI"));
+        assertTrue(zh.imageEmpty().contains("assets"));
     }
 
     @Test

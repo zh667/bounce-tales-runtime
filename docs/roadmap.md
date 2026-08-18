@@ -9,11 +9,11 @@ Work after this commit must go through GitHub Issues.
 - [x] Choose Hangar-style AWT (not Jademula)
 - [x] Window and keymap (arrows + WASD, Backspace, Q) with zh-CN UI
 - [x] Local asset loader from `assets/` (gitignored) — issue #3
-- [ ] Optional save slot and MIDI (ideas from Wafer-EX, original implementation)
+- [x] Workbench: PNG blit, MIDI, save slot, lang table, packed index `a`, ball preview — issue #13
 
 ## Milestone B — playable desktop
 
-- `game-logic` implements enough simulation to enter a chapter
+- `game-logic` implements enough simulation to enter a chapter (not just the preview ball)
 - Debug overlay / collision draw (inspired by HelloOO7, written here)
 - Document how to point BounceComposer at a local JAR
 

@@ -2,12 +2,14 @@ package io.github.zh667.bouncetales.pc;
 
 import io.github.zh667.bouncetales.logic.AssetInventory;
 import io.github.zh667.bouncetales.logic.GameAction;
+import io.github.zh667.bouncetales.logic.PackedKind;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -89,6 +91,73 @@ final class UiText {
                 inventory.vendor().orElse("?"),
                 yesNo(inventory.hasIcon()),
                 yesNo(inventory.hasChineseLang()));
+    }
+
+    String imageEmpty() {
+        return text("media.image.empty");
+    }
+
+    String imageLine(Workbench workbench) {
+        int total = workbench.catalog.images().size();
+        if (total == 0) {
+            return text("media.image.none");
+        }
+        return String.format(
+                text("media.image.line"),
+                workbench.imageIndex() + 1,
+                total,
+                workbench.imageName().orElse("?"));
+    }
+
+    String midiLine(Workbench workbench) {
+        int total = workbench.catalog.midis().size();
+        if (total == 0) {
+            return text("media.midi.none");
+        }
+        return String.format(
+                text("media.midi.line"),
+                workbench.midiIndex() + 1,
+                total,
+                workbench.midiName().orElse("?"),
+                midiStatus(workbench.midi.status()));
+    }
+
+    String langLine(Workbench workbench) {
+        if (workbench.lang.size() == 0) {
+            return text("media.lang.none");
+        }
+        String name = workbench.langName.isBlank() ? "?" : workbench.langName;
+        return String.format(text("media.lang.line"), name, workbench.lang.size(), workbench.lang.sample());
+    }
+
+    String packedLine(Workbench workbench) {
+        if (workbench.packed.fileCount() == 0) {
+            return text("media.packed.none");
+        }
+        return String.format(
+                text("media.packed.line"),
+                workbench.packed.fileCount(),
+                workbench.packed.batchCount(),
+                workbench.packed.countKind(PackedKind.LEVEL));
+    }
+
+    String saveLine(boolean savedThisSession, Path directory) {
+        return String.format(
+                text(savedThisSession ? "media.save.ok" : "media.save.idle"), directory);
+    }
+
+    String workbenchHint() {
+        return text("media.hint");
+    }
+
+    private String midiStatus(MidiPlayer.Status status) {
+        return switch (status) {
+            case IDLE -> text("media.midi.idle");
+            case READY -> text("media.midi.ready");
+            case PLAYING -> text("media.midi.playing");
+            case UNAVAILABLE -> text("media.midi.unavailable");
+            case FAILED -> text("media.midi.failed");
+        };
     }
 
     private String yesNo(boolean value) {
