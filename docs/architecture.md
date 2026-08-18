@@ -37,7 +37,7 @@ user JAR (local, gitignored `assets/`)
     -> GameCanvas buffer blit at 240×320, window scaled 2×
 ```
 
-The ChapterPlay overlay is a leftover prototype. It is not the default window.
+The ChapterPlay types in `game-logic` are leftover parsers for catalog/debug logs. They are not a play window.
 
 ## Platform check
 
