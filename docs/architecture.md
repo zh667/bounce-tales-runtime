@@ -20,18 +20,18 @@ Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong 
 
 | Phase | Desktop | Phone |
 | --- | --- | --- |
-| Now | Hangar-style AWT window + keymap (`:runtime-pc:run`) | Original JAR + J2ME Loader |
-| Next | Load local `assets/`, then MIDI/save | Still JAR in J2ME Loader |
+| Now | Hangar-style AWT window + keymap + local JAR inventory | Original JAR + J2ME Loader |
+| Next | MIDI/save, then enough logic to enter a chapter | Still JAR in J2ME Loader |
 | Later | Same `game-logic` in a desktop jar | Android Gradle APK |
 | Not now | — | iOS / IPA (needs a native rewrite) |
 
 ## Data flow (later)
 
 ```text
-user JAR (local)
-    -> extract / map resources (not in git)
-    -> game-logic reads formats
-    -> runtime draws and takes input
+user JAR (local, gitignored `assets/`)
+    -> AssetLocator reads manifest + entry names only
+    -> runtime shows inventory / later draws
+    -> game-logic will read formats after this
 ```
 
 ## What HelloOO7 is for

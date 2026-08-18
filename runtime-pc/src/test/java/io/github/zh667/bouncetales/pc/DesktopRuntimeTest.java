@@ -1,13 +1,19 @@
 package io.github.zh667.bouncetales.pc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github.zh667.bouncetales.logic.AssetInventory;
 import io.github.zh667.bouncetales.logic.GameAction;
 import io.github.zh667.bouncetales.logic.HostTarget;
 import java.awt.event.KeyEvent;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class DesktopRuntimeTest {
     @Test
@@ -21,8 +27,26 @@ class DesktopRuntimeTest {
     }
 
     @Test
-    void startHeadlessDoesNotOpenWindow() {
-        DesktopRuntime.start(true);
+    void startHeadlessReportsEmptyAssets(@TempDir Path temp) throws Exception {
+        Files.writeString(temp.resolve("README.md"), "keep", StandardCharsets.UTF_8);
+        AssetInventory inventory = DesktopRuntime.start(true, temp);
+        assertEquals(AssetInventory.Status.EMPTY, inventory.status());
+        assertFalse(inventory.ready());
+    }
+
+    @Test
+    void discoverHonorsSystemProperty(@TempDir Path temp) {
+        String previous = System.getProperty("bounce.assets.dir");
+        System.setProperty("bounce.assets.dir", temp.toString());
+        try {
+            assertEquals(temp.toAbsolutePath().normalize(), AssetPaths.discover());
+        } finally {
+            if (previous == null) {
+                System.clearProperty("bounce.assets.dir");
+            } else {
+                System.setProperty("bounce.assets.dir", previous);
+            }
+        }
     }
 }
 
@@ -66,6 +90,8 @@ class UiTextTest {
         assertEquals("星号（切换球形态）", zh.label(GameAction.STAR));
         assertTrue(zh.binding(GameAction.UP).contains("W"));
         assertTrue(zh.binding(GameAction.BACK).contains("Backspace"));
+        assertTrue(zh.assetsStatus(AssetInventory.empty(Path.of("assets"))).contains("Bounce Tales"));
+        assertEquals("资源", zh.assetsHeading());
     }
 
     @Test

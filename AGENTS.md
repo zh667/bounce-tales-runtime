@@ -21,7 +21,7 @@
 ## 2. Real commands
 
 - Install / resolve: `./gradlew test` (downloads the wrapper distribution and JDK 17 toolchain)
-- Run desktop host: `./gradlew :runtime-pc:run` (add `--args="--headless"` in CI or scripts)
+- Run desktop host: `./gradlew :runtime-pc:run` (add `--args="--headless"` in CI or scripts; optional `--assets <dir>`)
 - Format check: none yet
 - Lint: none yet
 - Typecheck: Java compile via Gradle
