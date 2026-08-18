@@ -4,7 +4,11 @@ import io.github.zh667.bouncetales.logic.AssetInventory;
 import io.github.zh667.bouncetales.logic.AssetLocator;
 import io.github.zh667.bouncetales.logic.GameLogic;
 import io.github.zh667.bouncetales.logic.HostTarget;
+import io.github.zh667.bouncetales.logic.JarCatalog;
+import io.github.zh667.bouncetales.logic.PackedIndex;
+import io.github.zh667.bouncetales.logic.SaveStore;
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +37,13 @@ public final class DesktopRuntime {
         System.out.println(banner());
         AssetInventory inventory = AssetLocator.scan(assetsDir);
         System.out.println(inventory.toLogLine());
+        SaveStore saves = new SaveStore(SaveStore.defaultDirectory());
+        inventory.jar().ifPresent(jar -> logCatalog(jar));
         if (headless) {
             return inventory;
         }
         UiText ui = UiText.forDefaultLocale();
-        SwingUtilities.invokeLater(() -> new DesktopFrame(ui, inventory).show());
+        SwingUtilities.invokeLater(() -> new DesktopFrame(ui, inventory, saves).show());
         return inventory;
     }
 
@@ -61,5 +67,19 @@ public final class DesktopRuntime {
             System.err.println("unknown args: " + rest);
         }
         start(headless, assets);
+    }
+
+    private static void logCatalog(Path jar) {
+        try {
+            JarCatalog catalog = JarCatalog.open(jar);
+            System.out.println(catalog.toLogLine());
+            if (catalog.hasPackedIndex()) {
+                AssetLocator.readEntry(jar, "a")
+                        .map(PackedIndex::tryParse)
+                        .ifPresent(index -> System.out.println(index.toLogLine()));
+            }
+        } catch (IOException ex) {
+            System.out.println("catalog: UNREADABLE " + ex.getMessage());
+        }
     }
 }

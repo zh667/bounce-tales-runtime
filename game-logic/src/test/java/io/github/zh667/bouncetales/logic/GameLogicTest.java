@@ -12,8 +12,8 @@ class GameLogicTest {
     }
 
     @Test
-    void describeMarksSkeletonPhase() {
-        assertEquals("game-logic/skeleton", GameLogic.describe());
+    void describeMarksPreviewPhase() {
+        assertEquals("game-logic/preview", GameLogic.describe());
     }
 
     @Test
