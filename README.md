@@ -4,7 +4,7 @@ Unofficial desktop + Android **runtime scaffold** for a Bounce Tales-compatible 
 
 This repository is **not** Bounce Tales, not a Nokia/Rovio product, and does not ship original game assets. You must supply a legally obtained original JAR locally. See [LEGAL.md](LEGAL.md).
 
-Current status: **skeleton only**. Modules compile and tests pass. No gameplay yet.
+Current status: Hangar-style desktop window and keymap work; **no gameplay yet**.
 
 ## Goals
 
@@ -18,8 +18,8 @@ J2ME as a phone OS is gone. Android play today still works by loading a JAR in [
 ## Layout
 
 ```text
-game-logic/        shared rules and module identity
-runtime-pc/        desktop entry (Hangar / Jademula-style host later)
+game-logic/        shared rules, GameAction
+runtime-pc/        Hangar-style AWT host (window + keymap)
 runtime-android/   APK host later; JVM stub for now
 assets/            local original resources only; gitignored
 docs/              architecture, roadmap, contributor rules
@@ -44,7 +44,20 @@ Windows:
 ```powershell
 .\gradlew.bat test
 .\gradlew.bat :runtime-pc:run
+.\gradlew.bat :runtime-pc:run --args="--headless"
 ```
+
+默认界面为简体中文（系统语言为 `en` 时用英文）。窗口里的键位：
+
+| 按键 | 动作 |
+| --- | --- |
+| ↑ / W | 上（跳跃） |
+| ↓ / S | 下 |
+| ← / A | 左 |
+| → / D | 右 |
+| Enter | 确认（跳跃） |
+| Backspace | 返回 |
+| Q | 星号（切换球形态） |
 
 Fallback if Gradle cannot start on a too-new JDK:
 

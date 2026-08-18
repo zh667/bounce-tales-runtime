@@ -21,7 +21,7 @@
 ## 2. Real commands
 
 - Install / resolve: `./gradlew test` (downloads the wrapper distribution and JDK 17 toolchain)
-- Run desktop stub: `./gradlew :runtime-pc:run`
+- Run desktop host: `./gradlew :runtime-pc:run` (add `--args="--headless"` in CI or scripts)
 - Format check: none yet
 - Lint: none yet
 - Typecheck: Java compile via Gradle
@@ -30,7 +30,7 @@
 - Build: `./gradlew build`
 - CI equivalent: `./gradlew test` or `.\scripts\verify.ps1`
 - Preview / deploy: none; do not publish APK/IPA
-- UI verification: none in skeleton
+- UI verification: `./gradlew :runtime-pc:run` then press arrows/WASD; tests cover KeyMap and zh-CN strings only
 - Metrics / Trace: none
 
 Do not report a command as passing unless it was actually run.

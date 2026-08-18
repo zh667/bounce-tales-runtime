@@ -6,10 +6,10 @@ Work after this commit must go through GitHub Issues.
 
 ## Milestone A — desktop host
 
-- Window and keypad/keyboard mapping
-- Evaluate Hangar vs Jademula as the first real host
-- Local asset loader from `assets/` (gitignored)
-- Optional save slot and MIDI (ideas from Wafer-EX, original implementation)
+- [x] Choose Hangar-style AWT (not Jademula)
+- [x] Window and keymap (arrows + WASD, Backspace, Q) with zh-CN UI
+- [ ] Local asset loader from `assets/` (gitignored) — issue #3
+- [ ] Optional save slot and MIDI (ideas from Wafer-EX, original implementation)
 
 ## Milestone B — playable desktop
 

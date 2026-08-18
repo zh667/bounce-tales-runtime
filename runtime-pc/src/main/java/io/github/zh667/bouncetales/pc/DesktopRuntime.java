@@ -2,9 +2,12 @@ package io.github.zh667.bouncetales.pc;
 
 import io.github.zh667.bouncetales.logic.GameLogic;
 import io.github.zh667.bouncetales.logic.HostTarget;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
+import javax.swing.SwingUtilities;
 
 /**
- * Desktop host stub. Later this process will own windowing, input, MIDI, and saves.
+ * Hangar-style desktop host entry. Windowing and input live here; gameplay stays in game-logic.
  */
 public final class DesktopRuntime {
     private DesktopRuntime() {
@@ -18,7 +21,18 @@ public final class DesktopRuntime {
         return "bounce-tales-runtime " + target() + " hosting " + GameLogic.describe();
     }
 
-    public static void main(String[] args) {
+    public static void start(boolean headless) {
         System.out.println(banner());
+        if (headless) {
+            return;
+        }
+        UiText ui = UiText.forDefaultLocale();
+        SwingUtilities.invokeLater(() -> new DesktopFrame(ui).show());
+    }
+
+    public static void main(String[] args) {
+        boolean headless = GraphicsEnvironment.isHeadless()
+                || Arrays.asList(args).contains("--headless");
+        start(headless);
     }
 }
