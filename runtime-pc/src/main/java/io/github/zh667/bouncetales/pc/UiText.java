@@ -1,5 +1,6 @@
 package io.github.zh667.bouncetales.pc;
 
+import io.github.zh667.bouncetales.logic.AssetInventory;
 import io.github.zh667.bouncetales.logic.GameAction;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +52,47 @@ final class UiText {
 
     String label(GameAction action) {
         return text("action." + action.name().toLowerCase(Locale.ROOT));
+    }
+
+    String assetsHeading() {
+        return text("assets.heading");
+    }
+
+    String assetsHint() {
+        return text("assets.hint");
+    }
+
+    String assetsStatus(AssetInventory inventory) {
+        return switch (inventory.status()) {
+            case MISSING_DIR -> String.format(text("assets.missing"), inventory.directory());
+            case EMPTY -> String.format(text("assets.empty"), inventory.directory());
+            case JAR_FOUND -> String.format(
+                    text("assets.found"),
+                    inventory.fileName().orElse("?"),
+                    inventory.midletName().orElse("?"),
+                    inventory.midletVersion().orElse("?"),
+                    inventory.entryCount());
+            case AMBIGUOUS -> String.format(text("assets.ambiguous"), inventory.directory());
+            case UNREADABLE -> String.format(
+                    text("assets.unreadable"),
+                    inventory.fileName().orElse("?"),
+                    inventory.error().orElse("?"));
+        };
+    }
+
+    String assetsDetails(AssetInventory inventory) {
+        if (!inventory.ready()) {
+            return "";
+        }
+        return String.format(
+                text("assets.details"),
+                inventory.vendor().orElse("?"),
+                yesNo(inventory.hasIcon()),
+                yesNo(inventory.hasChineseLang()));
+    }
+
+    private String yesNo(boolean value) {
+        return text(value ? "word.yes" : "word.no");
     }
 
     private String text(String key) {

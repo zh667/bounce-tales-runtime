@@ -4,6 +4,24 @@ Keep original Bounce Tales resources here on your machine only.
 
 This directory is gitignored except for this README and `.gitkeep`.
 
+## Load a JAR
+
+1. Copy a legally obtained Bounce Tales `.jar` into this folder.
+2. Keep only one Bounce Tales package here (other `.jar` files make the loader ask you to choose).
+3. Run:
+
+```powershell
+.\gradlew.bat :runtime-pc:run
+```
+
+Or point at another folder:
+
+```powershell
+.\gradlew.bat :runtime-pc:run --args="--assets D:\games\bounce"
+```
+
+The window should show `已识别` plus MIDlet name, version, and entry count. Git will not stage the `.jar`.
+
 Expected local inputs (do not commit):
 
 - original `.jar`

@@ -8,7 +8,7 @@ Work after this commit must go through GitHub Issues.
 
 - [x] Choose Hangar-style AWT (not Jademula)
 - [x] Window and keymap (arrows + WASD, Backspace, Q) with zh-CN UI
-- [ ] Local asset loader from `assets/` (gitignored) — issue #3
+- [x] Local asset loader from `assets/` (gitignored) — issue #3
 - [ ] Optional save slot and MIDI (ideas from Wafer-EX, original implementation)
 
 ## Milestone B — playable desktop

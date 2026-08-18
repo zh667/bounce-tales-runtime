@@ -4,7 +4,7 @@ Unofficial desktop + Android **runtime scaffold** for a Bounce Tales-compatible 
 
 This repository is **not** Bounce Tales, not a Nokia/Rovio product, and does not ship original game assets. You must supply a legally obtained original JAR locally. See [LEGAL.md](LEGAL.md).
 
-Current status: Hangar-style desktop window and keymap work; **no gameplay yet**.
+Current status: Hangar-style desktop window, keymap, and local JAR loader work; **no gameplay yet**.
 
 ## Goals
 
@@ -18,8 +18,8 @@ J2ME as a phone OS is gone. Android play today still works by loading a JAR in [
 ## Layout
 
 ```text
-game-logic/        shared rules, GameAction
-runtime-pc/        Hangar-style AWT host (window + keymap)
+game-logic/        shared rules, GameAction, local JAR inventory
+runtime-pc/        Hangar-style AWT host (window + keymap + asset status)
 runtime-android/   APK host later; JVM stub for now
 assets/            local original resources only; gitignored
 docs/              architecture, roadmap, contributor rules
@@ -46,6 +46,8 @@ Windows:
 .\gradlew.bat :runtime-pc:run
 .\gradlew.bat :runtime-pc:run --args="--headless"
 ```
+
+把合法取得的 Bounce Tales `.jar` 放到仓库里的 `assets/`（该目录已被 gitignore），再运行 `:runtime-pc:run`。窗口会显示是否识别到 MIDlet。也可以 `--assets <目录>` 或 `-Dbounce.assets.dir=`。
 
 默认界面为简体中文（系统语言为 `en` 时用英文）。窗口里的键位：
 
