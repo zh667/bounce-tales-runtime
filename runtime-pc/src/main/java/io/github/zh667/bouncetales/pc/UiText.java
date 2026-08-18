@@ -1,18 +1,13 @@
 package io.github.zh667.bouncetales.pc;
 
 import io.github.zh667.bouncetales.logic.AssetInventory;
-import io.github.zh667.bouncetales.logic.ChapterId;
-import io.github.zh667.bouncetales.logic.ChapterPlay;
 import io.github.zh667.bouncetales.logic.GameAction;
-import io.github.zh667.bouncetales.logic.PackedKind;
-import io.github.zh667.bouncetales.logic.RlefLevel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -35,36 +30,16 @@ final class UiText {
         return text("window.title");
     }
 
-    String hostLine() {
-        return text("host.line");
-    }
-
-    String helpHeading() {
-        return text("help.heading");
-    }
-
-    String idle() {
-        return text("status.idle");
-    }
-
-    String pressed(GameAction action) {
-        return String.format(text("status.pressed"), label(action));
+    String label(GameAction action) {
+        return text("action." + action.name().toLowerCase(Locale.ROOT));
     }
 
     String binding(GameAction action) {
         return text("keys." + action.name().toLowerCase(Locale.ROOT)) + "    " + label(action);
     }
 
-    String label(GameAction action) {
-        return text("action." + action.name().toLowerCase(Locale.ROOT));
-    }
-
     String assetsHeading() {
         return text("assets.heading");
-    }
-
-    String assetsHint() {
-        return text("assets.hint");
     }
 
     String assetsStatus(AssetInventory inventory) {
@@ -85,106 +60,8 @@ final class UiText {
         };
     }
 
-    String assetsDetails(AssetInventory inventory) {
-        if (!inventory.ready()) {
-            return "";
-        }
-        return String.format(
-                text("assets.details"),
-                inventory.vendor().orElse("?"),
-                yesNo(inventory.hasIcon()),
-                yesNo(inventory.hasChineseLang()));
-    }
-
-    String imageEmpty() {
-        return text("media.image.empty");
-    }
-
-    String imageLine(Workbench workbench) {
-        int total = workbench.catalog.images().size();
-        if (total == 0) {
-            return text("media.image.none");
-        }
-        return String.format(
-                text("media.image.line"),
-                workbench.imageIndex() + 1,
-                total,
-                workbench.imageName().orElse("?"));
-    }
-
-    String midiLine(Workbench workbench) {
-        int total = workbench.catalog.midis().size();
-        if (total == 0) {
-            return text("media.midi.none");
-        }
-        return String.format(
-                text("media.midi.line"),
-                workbench.midiIndex() + 1,
-                total,
-                workbench.midiName().orElse("?"),
-                midiStatus(workbench.midi.status()));
-    }
-
-    String langLine(Workbench workbench) {
-        if (workbench.lang.size() == 0) {
-            return text("media.lang.none");
-        }
-        String name = workbench.langName.isBlank() ? "?" : workbench.langName;
-        return String.format(text("media.lang.line"), name, workbench.lang.size(), workbench.lang.sample());
-    }
-
-    String packedLine(Workbench workbench) {
-        if (workbench.packed.fileCount() == 0) {
-            return text("media.packed.none");
-        }
-        return String.format(
-                text("media.packed.line"),
-                workbench.packed.fileCount(),
-                workbench.packed.batchCount(),
-                workbench.packed.countKind(PackedKind.LEVEL));
-    }
-
-    String saveLine(boolean savedThisSession, Path directory) {
-        return String.format(
-                text(savedThisSession ? "media.save.ok" : "media.save.idle"), directory);
-    }
-
-    String workbenchHint() {
-        return text("media.hint");
-    }
-
-    String chapterHint() {
-        return text("chapter.hint");
-    }
-
     String midletFailed(String detail) {
         return String.format(text("midlet.failed"), detail == null ? "?" : detail);
-    }
-
-    String chapterLine(ChapterPlay play) {
-        if (play == null) {
-            return text("chapter.none");
-        }
-        RlefLevel level = play.level();
-        return String.format(
-                text("chapter.line"),
-                ChapterId.MISTY_MORNING.slug(),
-                level.terrain().size(),
-                level.markers().size());
-    }
-
-    private String midiStatus(MidiPlayer.Status status) {
-        return switch (status) {
-            case IDLE -> text("media.midi.idle");
-            case READY -> text("media.midi.ready");
-            case PLAYING -> text("media.midi.playing");
-            case UNAVAILABLE -> text("media.midi.unavailable");
-            case FAILED -> text("media.midi.failed");
-        };
-    }
-
-    private String yesNo(boolean value) {
-        return text(value ? "word.yes" : "word.no");
     }
 
     private String text(String key) {
@@ -198,22 +75,13 @@ final class UiText {
     private static Properties load(Locale locale) {
         Properties defaults = loadFile("/i18n/messages.properties");
         Properties overlay = new Properties(defaults);
-        String tag = locale.toLanguageTag().replace('-', '_');
         String language = locale.getLanguage();
         if ("zh".equals(language)) {
             overlay.putAll(loadFile("/i18n/messages_zh_CN.properties"));
         } else if ("en".equals(language)) {
             overlay.putAll(loadFile("/i18n/messages_en.properties"));
-        } else if (!"root".equalsIgnoreCase(tag)) {
-            tryLoadOptional(overlay, "/i18n/messages_" + tag + ".properties");
         }
         return overlay;
-    }
-
-    private static void tryLoadOptional(Properties target, String path) {
-        if (UiText.class.getResource(path) != null) {
-            target.putAll(loadFile(path));
-        }
     }
 
     private static Properties loadFile(String path) {

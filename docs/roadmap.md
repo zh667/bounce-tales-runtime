@@ -11,12 +11,14 @@ Work after this commit must go through GitHub Issues.
 - [x] Local asset loader from `assets/` (gitignored) — issue #3
 - [x] Workbench: PNG blit, MIDI, save slot, lang table, packed index `a`, ball preview — issue #13
 - [x] Load user JAR and start original MIDlet — issue #17
+- [x] Playable title, menus, and chapters from original bytecode — issues #19 #21
+- [x] Double-click desktop JAR; retire `--debug-overlay` — issue #23
 
 ## Milestone B — playable original
 
-- [ ] Chase missing MIDP / Nokia / MMAPI methods until the title and menus appear
-- [ ] Play a chapter from original bytecode (not the RLEF overlay)
-- [ ] Keep `--debug-overlay` gated; delete or archive the remake overlay later
+- [x] Chase missing MIDP / Nokia / MMAPI methods until the title and menus appear
+- [x] Play a chapter from original bytecode (not the RLEF overlay)
+- [x] Keep `--debug-overlay` gated; overlay UI removed in issue #23
 - Debug overlay / collision draw stays unused unless requested
 
 ## Milestone C — Android APK

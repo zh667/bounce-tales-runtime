@@ -141,13 +141,31 @@ public final class AssetLocator {
                     continue;
                 }
                 String name = path.getFileName().toString().toLowerCase(Locale.ROOT);
-                if (name.endsWith(".jar")) {
+                if (name.endsWith(".jar") && !isHostRuntimeJar(path)) {
                     jars.add(path);
                 }
             }
         }
         jars.sort(Path::compareTo);
         return jars;
+    }
+
+    /** Skip our packaged desktop host so it can sit next to the original game JAR. */
+    public static boolean isHostRuntimeJar(Path jar) {
+        String name = jar.getFileName().toString().toLowerCase(Locale.ROOT);
+        if (name.equals("bounce-tales-runtime.jar")) {
+            return true;
+        }
+        try (JarFile jarFile = new JarFile(jar.toFile())) {
+            Manifest manifest = jarFile.getManifest();
+            if (manifest == null) {
+                return false;
+            }
+            String main = manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            return main != null && main.contains("io.github.zh667.bouncetales.pc.DesktopRuntime");
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     private static List<String> names(List<Path> jars) {

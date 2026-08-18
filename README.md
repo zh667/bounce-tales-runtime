@@ -4,7 +4,7 @@ Unofficial **MIDlet host** for a legally obtained Bounce Tales JAR. Desktop now;
 
 This repository is **not** Bounce Tales, not a Nokia/Rovio product, and does not ship original game assets. You must supply a legally obtained original JAR locally. See [LEGAL.md](LEGAL.md).
 
-Current status: with a local original JAR, the desktop host loads that JAR and starts the original `RMIDlet`. Menus and chapters come from the original bytecode. The older Misty Morning debug overlay is still in the tree (`--debug-overlay`) but is not the product.
+Current status: with a local original JAR, the desktop host loads that JAR and starts the original `RMIDlet`. Menus and chapters come from the original bytecode. You can also build a double-clickable `bounce-tales-runtime.jar` (it never embeds the original game).
 
 ## Goals
 
@@ -13,7 +13,7 @@ Current status: with a local original JAR, the desktop host loads that JAR and s
 3. Later wrap the same host as an Android APK via `runtime-android`.
 4. Do **not** target iOS until the desktop and Android paths are real.
 
-Until this host can play a full chapter, [J2ME Loader](https://github.com/nikita36078/J2ME-Loader) plus the same local JAR is the working phone path.
+Until the Android APK exists, [J2ME Loader](https://github.com/nikita36078/J2ME-Loader) plus the same local JAR is the working phone path.
 
 ## Layout
 
@@ -38,6 +38,7 @@ Java 26 can compile the skeleton with `--release 17`, but CI and `./gradlew` are
 ```bash
 ./gradlew test
 ./gradlew :runtime-pc:run
+./gradlew :runtime-pc:desktopJar
 ```
 
 Windows:
@@ -46,10 +47,18 @@ Windows:
 .\gradlew.bat test
 .\gradlew.bat :runtime-pc:run
 .\gradlew.bat :runtime-pc:run --args="--headless"
-.\gradlew.bat :runtime-pc:run --args="--debug-overlay"
+.\gradlew.bat :runtime-pc:desktopJar
 ```
 
-把合法取得的 Bounce Tales `.jar` 放到仓库里的 `assets/`（该目录已被 gitignore），再运行 `:runtime-pc:run`。宿主会加载 JAR 并启动原版 MIDlet。也可以 `--assets <目录>` 或 `-Dbounce.assets.dir=`。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
+产出：`runtime-pc\build\libs\bounce-tales-runtime.jar`。把合法取得的 Bounce Tales `.jar` 放到它旁边，或放到旁边的 `assets/` 文件夹，然后双击宿主 JAR（本机需已安装 Java 17+）。也可以：
+
+```powershell
+java -jar runtime-pc\build\libs\bounce-tales-runtime.jar
+```
+
+仓库开发仍可用 `:runtime-pc:run`（把原版 JAR 放在 gitignored 的 `assets/`）。`--assets <目录>`、`-Dbounce.assets.dir=`、`BOUNCE_ASSETS_DIR` 仍然有效。存档默认写在用户目录 `.bounce-tales-runtime/saves/`（可用 `-Dbounce.save.dir=` 或 `BOUNCE_SAVE_DIR` 改）。
+
+`--debug-overlay` 已移除；没有原版 JAR 时会弹出说明窗口，而不是旧的碰撞预览。
 
 默认界面为简体中文（系统语言为 `en` 时用英文）。原版游戏键位：
 
@@ -62,8 +71,6 @@ Windows:
 | Enter | 确认 / FIRE |
 | Backspace / Esc | 返回 |
 | Q | 星号 |
-
-`--debug-overlay` 仍打开以前的关卡碰撞预览，不是默认窗口。
 
 Fallback if Gradle cannot start on a too-new JDK:
 

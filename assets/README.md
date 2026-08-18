@@ -20,7 +20,9 @@ Or point at another folder:
 .\gradlew.bat :runtime-pc:run --args="--assets D:\games\bounce"
 ```
 
-The window should start the original MIDlet (menus from the JAR, not the debug overlay). Git will not stage the `.jar`. Do not upload this file to GitHub.
+The window should start the original MIDlet. Git will not stage the `.jar`. Do not upload this file to GitHub.
+
+You can also build `.\gradlew.bat :runtime-pc:desktopJar` and place the original JAR next to `bounce-tales-runtime.jar`.
 
 Expected local inputs (do not commit):
 

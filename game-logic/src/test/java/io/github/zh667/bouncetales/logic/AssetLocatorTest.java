@@ -73,6 +73,26 @@ class AssetLocatorTest {
     }
 
     @Test
+    void skipsPackagedHostJarSittingBesideTheGame() throws IOException {
+        Path game = writeJar("bounce-tales.jar", "Bounce Tales", "2.0.14", "Nokia");
+        Path host = temp.resolve("bounce-tales-runtime.jar");
+        Manifest manifest = new Manifest();
+        Attributes attrs = manifest.getMainAttributes();
+        attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        attrs.put(Attributes.Name.MAIN_CLASS, "io.github.zh667.bouncetales.pc.DesktopRuntime");
+        try (OutputStream raw = Files.newOutputStream(host);
+                JarOutputStream out = new JarOutputStream(raw, manifest)) {
+            out.putNextEntry(new ZipEntry("placeholder.txt"));
+            out.write("host".getBytes(StandardCharsets.UTF_8));
+            out.closeEntry();
+        }
+        AssetInventory inventory = AssetLocator.scan(temp);
+        assertEquals(AssetInventory.Status.JAR_FOUND, inventory.status());
+        assertEquals(game.getFileName().toString(), inventory.fileName().orElseThrow());
+        assertTrue(AssetLocator.isHostRuntimeJar(host));
+    }
+
+    @Test
     void unreadableJar() throws IOException {
         Path junk = temp.resolve("broken.jar");
         Files.writeString(junk, "not a zip", StandardCharsets.UTF_8);

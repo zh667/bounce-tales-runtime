@@ -23,11 +23,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 /**
- * Desktop host: load the user JAR and run its MIDlet. Overlay remake is opt-in.
+ * Desktop host: load the user JAR and run its MIDlet.
  */
 public final class DesktopRuntime {
-    private DesktopRuntime() {
-    }
+    private DesktopRuntime() {}
 
     public static HostTarget target() {
         return HostTarget.DESKTOP;
@@ -38,14 +37,10 @@ public final class DesktopRuntime {
     }
 
     public static AssetInventory start(boolean headless) {
-        return start(headless, AssetPaths.discover(), false);
+        return start(headless, AssetPaths.discover());
     }
 
     public static AssetInventory start(boolean headless, Path assetsDir) {
-        return start(headless, assetsDir, false);
-    }
-
-    public static AssetInventory start(boolean headless, Path assetsDir, boolean debugOverlay) {
         System.setOut(new PrintStream(System.out, true));
         System.setErr(new PrintStream(System.err, true));
         Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
@@ -64,26 +59,21 @@ public final class DesktopRuntime {
             return inventory;
         }
         UiText ui = UiText.forDefaultLocale();
-        if (debugOverlay) {
-            SwingUtilities.invokeLater(() -> new DesktopFrame(ui, inventory, saves).show());
-            return inventory;
-        }
         if (inventory.ready()) {
             try {
                 MidletHost.launch(inventory.jar().orElseThrow(), saves);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SwingUtilities.invokeLater(() -> showLaunchError(ui, ex));
+                SwingUtilities.invokeLater(() -> showMessage(ui, ui.midletFailed(ex.getMessage())));
             }
             return inventory;
         }
-        SwingUtilities.invokeLater(() -> new DesktopFrame(ui, inventory, saves).show());
+        SwingUtilities.invokeLater(() -> showMessage(ui, ui.assetsStatus(inventory)));
         return inventory;
     }
 
     public static void main(String[] args) {
         boolean headless = GraphicsEnvironment.isHeadless();
-        boolean debugOverlay = false;
         Path assets = AssetPaths.discover();
         List<String> rest = new ArrayList<>();
         for (int i = 0; i < args.length; i++) {
@@ -91,7 +81,7 @@ public final class DesktopRuntime {
             if ("--headless".equals(arg)) {
                 headless = true;
             } else if ("--debug-overlay".equals(arg)) {
-                debugOverlay = true;
+                System.err.println("--debug-overlay was removed; this host always runs the original MIDlet");
             } else if ("--assets".equals(arg) && i + 1 < args.length) {
                 assets = Path.of(args[++i]);
             } else if (arg.startsWith("--assets=")) {
@@ -103,13 +93,13 @@ public final class DesktopRuntime {
         if (!rest.isEmpty()) {
             System.err.println("unknown args: " + rest);
         }
-        start(headless, assets, debugOverlay);
+        start(headless, assets);
     }
 
-    private static void showLaunchError(UiText ui, Exception ex) {
+    private static void showMessage(UiText ui, String body) {
         JFrame frame = new JFrame(ui.title());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        JTextArea area = new JTextArea(ui.midletFailed(ex.getMessage()));
+        JTextArea area = new JTextArea(body);
         area.setEditable(false);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);

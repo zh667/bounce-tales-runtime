@@ -48,6 +48,21 @@ class DesktopRuntimeTest {
             }
         }
     }
+
+    @Test
+    void discoverPrefersAssetsFolderThenSiblingGameJar(@TempDir Path temp) throws Exception {
+        Path install = temp.resolve("install");
+        Path assets = install.resolve("assets");
+        Files.createDirectories(assets);
+        Files.writeString(assets.resolve("README.md"), "keep", StandardCharsets.UTF_8);
+        assertEquals(assets.toAbsolutePath().normalize(), AssetPaths.discoverFrom(install, temp));
+
+        Path beside = temp.resolve("play");
+        Files.createDirectories(beside);
+        Files.write(beside.resolve("bounce-tales.jar"), new byte[] {1, 2, 3});
+        Files.write(beside.resolve("bounce-tales-runtime.jar"), new byte[] {4, 5, 6});
+        assertEquals(beside.toAbsolutePath().normalize(), AssetPaths.discoverFrom(beside, temp));
+    }
 }
 
 class KeyMapTest {
@@ -92,11 +107,7 @@ class UiTextTest {
         assertTrue(zh.binding(GameAction.BACK).contains("Backspace"));
         assertTrue(zh.assetsStatus(AssetInventory.empty(Path.of("assets"))).contains("Bounce Tales"));
         assertEquals("资源", zh.assetsHeading());
-        assertTrue(zh.workbenchHint().contains("MIDI"));
-        assertTrue(zh.chapterHint().contains("跳跃"));
-        assertTrue(zh.chapterLine(null).contains("bf"));
         assertTrue(zh.midletFailed("boom").contains("boom"));
-        assertTrue(zh.imageEmpty().contains("assets"));
     }
 
     @Test
