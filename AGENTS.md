@@ -30,7 +30,7 @@
 - Build: `./gradlew build`
 - CI equivalent: `./gradlew test` or `.\scripts\verify.ps1`
 - Preview / deploy: none; do not publish APK/IPA
-- UI verification: `./gradlew :runtime-pc:run` with a local JAR in `assets/`; window should blit a PNG, show a lang sample, and move the preview ball. Tests cover parsers, SaveStore, KeyMap, MidiPlayer, and zh-CN strings. Do not decode original art in CI.
+- UI verification: `./gradlew :runtime-pc:run` with a local JAR in `assets/`; window should enter Misty Morning terrain overlay. Tests cover RLEF/bit-pack parsers with synthetic blobs only.
 - Metrics / Trace: none
 
 Do not report a command as passing unless it was actually run.

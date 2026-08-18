@@ -13,7 +13,9 @@ Work after this commit must go through GitHub Issues.
 
 ## Milestone B — playable desktop
 
-- `game-logic` implements enough simulation to enter a chapter (not just the preview ball)
+- [x] Load Misty Morning (`bf`) and draw collision overlay — issue #15
+- [ ] Eggs, trampolines, enemies, water, cannons as gameplay (markers are drawn only)
+- [ ] Menus / chapter select
 - Debug overlay / collision draw (inspired by HelloOO7, written here)
 - Document how to point BounceComposer at a local JAR
 

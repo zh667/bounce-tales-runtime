@@ -6,6 +6,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -62,6 +63,23 @@ public final class AssetLocator {
         } catch (IOException ex) {
             return Optional.empty();
         }
+    }
+
+    public static Optional<byte[]> readSlice(Path jar, String entryName, int skipOffset, int readLength) {
+        Optional<byte[]> all = readEntry(jar, entryName);
+        if (all.isEmpty()) {
+            return Optional.empty();
+        }
+        byte[] bytes = all.get();
+        int skip = Math.max(0, skipOffset);
+        if (skip >= bytes.length) {
+            return Optional.empty();
+        }
+        int length = readLength <= 0 ? bytes.length - skip : Math.min(readLength, bytes.length - skip);
+        if (skip == 0 && length == bytes.length) {
+            return all;
+        }
+        return Optional.of(Arrays.copyOfRange(bytes, skip, skip + length));
     }
 
     private static AssetInventory readJar(Path assetsDir, Path jar) throws IOException {

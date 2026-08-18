@@ -34,6 +34,7 @@ class JarCatalogTest {
             put(out, "lang.zh-CN", "x".getBytes(StandardCharsets.UTF_8));
             put(out, "lang.xx", "y".getBytes(StandardCharsets.UTF_8));
             put(out, "a", new byte[] {0, 0});
+            put(out, "bf", new byte[] {1});
         }
         JarCatalog catalog = JarCatalog.open(jar);
         assertEquals(2, catalog.images().size());
@@ -42,6 +43,7 @@ class JarCatalogTest {
         assertEquals("music/theme.mid", catalog.midis().get(0));
         assertEquals("lang.zh-CN", catalog.preferredLang().orElseThrow());
         assertTrue(catalog.hasPackedIndex());
+        assertTrue(catalog.hasCampaign01());
         assertTrue(catalog.hasMedia());
         assertTrue(catalog.toLogLine().contains("png=2"));
     }

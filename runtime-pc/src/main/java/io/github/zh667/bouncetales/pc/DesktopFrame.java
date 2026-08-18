@@ -3,7 +3,12 @@ package io.github.zh667.bouncetales.pc;
 import io.github.zh667.bouncetales.logic.AssetInventory;
 import io.github.zh667.bouncetales.logic.AssetLocator;
 import io.github.zh667.bouncetales.logic.BallSim;
+import io.github.zh667.bouncetales.logic.ChapterId;
+import io.github.zh667.bouncetales.logic.ChapterLoader;
+import io.github.zh667.bouncetales.logic.ChapterPlay;
 import io.github.zh667.bouncetales.logic.GameAction;
+import io.github.zh667.bouncetales.logic.RlefKind;
+import io.github.zh667.bouncetales.logic.RlefLevel;
 import io.github.zh667.bouncetales.logic.SaveStore;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,12 +42,14 @@ import javax.swing.WindowConstants;
 final class DesktopFrame {
     private static final int WIDTH = 420;
     private static final int HEIGHT = 640;
+    private static final int CHAPTER_HEIGHT = 468;
     private static final int IMAGE_TOP = 28;
     private static final int IMAGE_HEIGHT = 168;
     private static final int FIELD_TOP = 204;
     private static final Color FIELD = new Color(32, 48, 40);
     private static final Color BALL = new Color(80, 196, 92);
     private static final Color BALL_SHADOW = new Color(18, 28, 22);
+    private static final Color CHAPTER_SKY = new Color(24, 36, 48);
 
     private final UiText strings;
     private final AssetInventory inventory;
@@ -50,6 +57,7 @@ final class DesktopFrame {
     private final Set<GameAction> held = EnumSet.noneOf(GameAction.class);
     private final BallSim ball = new BallSim();
     private Workbench workbench;
+    private ChapterPlay chapter;
     private boolean saveOk;
     private JFrame frame;
     private Timer timer;
@@ -65,6 +73,7 @@ final class DesktopFrame {
             throw new IllegalStateException("DesktopFrame.show must run on the EDT");
         }
         workbench = openWorkbench();
+        chapter = openChapter();
         frame = new JFrame(strings.title());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
@@ -105,11 +114,19 @@ final class DesktopFrame {
         frame.setVisible(true);
         view.requestFocusInWindow();
         timer = new Timer(16, event -> {
-            ball.tick(
-                    16f / 1000f,
-                    held.contains(GameAction.LEFT),
-                    held.contains(GameAction.RIGHT),
-                    held.contains(GameAction.UP));
+            if (chapter != null) {
+                chapter.tick(
+                        16f / 1000f,
+                        held.contains(GameAction.LEFT),
+                        held.contains(GameAction.RIGHT),
+                        held.contains(GameAction.UP) || held.contains(GameAction.FIRE));
+            } else {
+                ball.tick(
+                        16f / 1000f,
+                        held.contains(GameAction.LEFT),
+                        held.contains(GameAction.RIGHT),
+                        held.contains(GameAction.UP));
+            }
             workbench.poll();
             view.repaint();
         });
@@ -126,11 +143,24 @@ final class DesktopFrame {
     private void onAction(GameAction action) {
         switch (action) {
             case STAR -> workbench.nextImage();
-            case FIRE -> workbench.toggleMidi();
-            case DOWN -> workbench.nextMidi();
+            case FIRE -> {
+                if (chapter == null) {
+                    workbench.toggleMidi();
+                }
+            }
+            case DOWN -> {
+                if (chapter != null) {
+                    workbench.toggleMidi();
+                } else {
+                    workbench.nextMidi();
+                }
+            }
             case BACK -> {
                 workbench.stopMidi();
                 saveOk = workbench.save();
+                if (chapter != null) {
+                    chapter.reset();
+                }
             }
             default -> {
                 // movement is sampled from held keys in the timer
@@ -148,6 +178,13 @@ final class DesktopFrame {
                     }
                 })
                 .orElseGet(() -> Workbench.empty(saves));
+    }
+
+    private ChapterPlay openChapter() {
+        return inventory.jar()
+                .flatMap(jar -> ChapterLoader.load(jar, workbench.packed, ChapterId.MISTY_MORNING))
+                .map(ChapterPlay::new)
+                .orElse(null);
     }
 
     private void shutdown() {
@@ -182,8 +219,12 @@ final class DesktopFrame {
             Graphics2D g = (Graphics2D) graphics.create();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            drawImagePreview(g);
-            drawPlayfield(g);
+            if (chapter != null) {
+                drawChapter(g);
+            } else {
+                drawImagePreview(g);
+                drawPlayfield(g);
+            }
             drawHud(g);
             g.dispose();
         }
@@ -211,6 +252,96 @@ final class DesktopFrame {
             }
         }
 
+        private void drawChapter(Graphics2D g) {
+            int w = getWidth();
+            int h = CHAPTER_HEIGHT;
+            g.setColor(CHAPTER_SKY);
+            g.fillRect(0, 0, w, h);
+            RlefLevel level = chapter.level();
+            float zoom = 1f;
+            float camX = chapter.x();
+            float camY = chapter.y();
+            for (RlefLevel.Terrain poly : level.terrain()) {
+                Color fill = opaque(poly.rgb());
+                Color line = fill.brighter();
+                int[] tris = poly.triangles();
+                List<RlefLevel.Vec2> verts = poly.vertices();
+                if (tris.length >= 3) {
+                    for (int i = 0; i + 2 < tris.length; i += 3) {
+                        int i0 = tris[i];
+                        int i1 = tris[i + 1];
+                        int i2 = tris[i + 2];
+                        if (i0 < 0 || i1 < 0 || i2 < 0 || i0 >= verts.size() || i1 >= verts.size() || i2 >= verts.size()) {
+                            continue;
+                        }
+                        int[] xs = {
+                            screenX(verts.get(i0).x(), camX, zoom, w),
+                            screenX(verts.get(i1).x(), camX, zoom, w),
+                            screenX(verts.get(i2).x(), camX, zoom, w)
+                        };
+                        int[] ys = {
+                            screenY(verts.get(i0).y(), camY, zoom, h),
+                            screenY(verts.get(i1).y(), camY, zoom, h),
+                            screenY(verts.get(i2).y(), camY, zoom, h)
+                        };
+                        g.setColor(fill);
+                        g.fillPolygon(xs, ys, 3);
+                    }
+                }
+                int n = verts.size();
+                int[] ox = new int[n];
+                int[] oy = new int[n];
+                for (int i = 0; i < n; i++) {
+                    ox[i] = screenX(verts.get(i).x(), camX, zoom, w);
+                    oy[i] = screenY(verts.get(i).y(), camY, zoom, h);
+                }
+                g.setColor(line);
+                g.drawPolygon(ox, oy, n);
+            }
+            for (RlefLevel.Marker marker : level.markers()) {
+                int mx = screenX(marker.worldX(), camX, zoom, w);
+                int my = screenY(marker.worldY(), camY, zoom, h);
+                g.setColor(markerColor(marker.kind()));
+                g.fillOval(mx - 6, my - 6, 12, 12);
+            }
+            int bx = screenX(chapter.x(), camX, zoom, w);
+            int by = screenY(chapter.y(), camY, zoom, h);
+            int r = Math.max(4, Math.round(chapter.radius() * zoom));
+            g.setColor(BALL_SHADOW);
+            g.fillOval(bx - r + 3, by - r + 5, r * 2, r * 2);
+            g.setColor(BALL);
+            g.fillOval(bx - r, by - r, r * 2, r * 2);
+            g.setColor(new Color(220, 255, 220));
+            g.fillOval(bx - r / 2, by - r / 2, Math.max(2, r / 2), Math.max(2, r / 2));
+        }
+
+        private int screenX(float worldX, float camX, float zoom, int viewW) {
+            return Math.round(viewW / 2f + (worldX - camX) * zoom);
+        }
+
+        private int screenY(float worldY, float camY, float zoom, int viewH) {
+            return Math.round(viewH / 2f - (worldY - camY) * zoom);
+        }
+
+        private Color opaque(int rgb) {
+            int value = rgb;
+            if ((value & 0xFF000000) == 0) {
+                value |= 0xFF000000;
+            }
+            return new Color(value, true);
+        }
+
+        private Color markerColor(RlefKind kind) {
+            return switch (kind) {
+                case EGG -> new Color(240, 220, 90);
+                case ENEMY -> new Color(200, 70, 70);
+                case TRAMPOLINE -> new Color(80, 180, 220);
+                case CANNON -> new Color(160, 160, 170);
+                case WATER -> new Color(50, 110, 190);
+                default -> new Color(200, 200, 200);
+            };
+        }
+
         private void drawPlayfield(Graphics2D g) {
             int x = 20;
             int y = FIELD_TOP;
@@ -231,27 +362,18 @@ final class DesktopFrame {
 
         private void drawHud(Graphics2D g) {
             g.setColor(getForeground());
-            int y = FIELD_TOP + Math.round(BallSim.HEIGHT) + 8;
+            int y = chapter != null ? CHAPTER_HEIGHT + 4 : FIELD_TOP + Math.round(BallSim.HEIGHT) + 8;
             g.setFont(new Font("SansSerif", Font.BOLD, 14));
-            y = draw(g, strings.assetsHeading(), 20, y, 18);
-            g.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            y = draw(g, strings.assetsStatus(inventory), 20, y, 15);
-            String details = strings.assetsDetails(inventory);
-            if (!details.isBlank()) {
-                y = draw(g, details, 20, y, 15);
-            }
-            y = draw(g, strings.imageLine(workbench), 20, y, 15);
-            y = draw(g, strings.midiLine(workbench), 20, y, 15);
-            y = draw(g, strings.langLine(workbench), 20, y, 15);
-            y = draw(g, strings.packedLine(workbench), 20, y, 15);
-            y = draw(g, strings.saveLine(saveOk, workbench.saves.directory()), 20, y, 15);
-            y += 6;
-            g.setFont(new Font("SansSerif", Font.BOLD, 13));
-            y = draw(g, strings.helpHeading(), 20, y, 16);
-            g.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            y = draw(g, strings.workbenchHint(), 20, y, 15);
-            g.setFont(new Font("SansSerif", Font.BOLD, 13));
-            draw(g, heldStatus(), 20, y + 6, 16);
+            y = draw(g, strings.assetsHeading(), 20, y, 16);
+            g.setFont(new Font("SansSerif", Font.PLAIN, 11));
+            y = draw(g, strings.assetsStatus(inventory), 20, y, 14);
+            y = draw(g, strings.chapterLine(chapter), 20, y, 14);
+            y = draw(g, strings.midiLine(workbench), 20, y, 14);
+            y = draw(g, strings.saveLine(saveOk, workbench.saves.directory()), 20, y, 14);
+            g.setFont(new Font("SansSerif", Font.PLAIN, 11));
+            y = draw(g, chapter != null ? strings.chapterHint() : strings.workbenchHint(), 20, y, 14);
+            g.setFont(new Font("SansSerif", Font.BOLD, 12));
+            draw(g, heldStatus(), 20, y + 4, 14);
         }
 
         private String heldStatus() {

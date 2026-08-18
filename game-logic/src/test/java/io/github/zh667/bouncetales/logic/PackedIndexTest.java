@@ -23,6 +23,8 @@ class PackedIndexTest {
         assertEquals(1, index.residents().size());
         assertEquals(7, index.residents().get(0).type());
         assertTrue(index.toLogLine().contains("levels=1"));
+        assertEquals("img/ball.png", index.findPath("img/ball.png").orElseThrow().path());
+        assertTrue(index.findPath("missing").isEmpty());
     }
 
     @Test

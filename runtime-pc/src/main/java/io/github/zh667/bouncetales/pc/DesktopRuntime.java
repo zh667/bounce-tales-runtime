@@ -2,6 +2,8 @@ package io.github.zh667.bouncetales.pc;
 
 import io.github.zh667.bouncetales.logic.AssetInventory;
 import io.github.zh667.bouncetales.logic.AssetLocator;
+import io.github.zh667.bouncetales.logic.ChapterId;
+import io.github.zh667.bouncetales.logic.ChapterLoader;
 import io.github.zh667.bouncetales.logic.GameLogic;
 import io.github.zh667.bouncetales.logic.HostTarget;
 import io.github.zh667.bouncetales.logic.JarCatalog;
@@ -76,7 +78,11 @@ public final class DesktopRuntime {
             if (catalog.hasPackedIndex()) {
                 AssetLocator.readEntry(jar, "a")
                         .map(PackedIndex::tryParse)
-                        .ifPresent(index -> System.out.println(index.toLogLine()));
+                        .ifPresent(index -> {
+                            System.out.println(index.toLogLine());
+                            ChapterLoader.load(jar, index, ChapterId.MISTY_MORNING)
+                                    .ifPresent(level -> System.out.println(level.toLogLine()));
+                        });
             }
         } catch (IOException ex) {
             System.out.println("catalog: UNREADABLE " + ex.getMessage());

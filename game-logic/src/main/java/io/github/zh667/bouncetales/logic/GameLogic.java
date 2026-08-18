@@ -10,6 +10,6 @@ public final class GameLogic {
     }
 
     public static String describe() {
-        return MODULE_NAME + "/preview";
+        return MODULE_NAME + "/chapter";
     }
 }
