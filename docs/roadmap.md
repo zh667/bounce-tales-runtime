@@ -13,6 +13,7 @@ Work after this commit must go through GitHub Issues.
 - [x] Load user JAR and start original MIDlet — issue #17
 - [x] Playable title, menus, and chapters from original bytecode — issues #19 #21
 - [x] Double-click desktop JAR; retire `--debug-overlay` — issue #23
+- [x] Commit the host JAR so a GitHub clone can double-click — issue #26
 
 ## Milestone B — playable original
 

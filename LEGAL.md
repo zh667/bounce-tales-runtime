@@ -16,7 +16,9 @@ Original scaffolding, documentation, J2ME API shims, and later independently wri
 
 Keep a legally obtained Bounce Tales JAR on **your machine** (`assets/` is gitignored). The host loads that file locally.
 
-Do **not** upload it:
+The committed `bounce-tales-runtime.jar` at the repository root is **this project's host**. Apache-2.0 covers that file. It must not contain the original game.
+
+Do **not** upload the original game JAR:
 
 - Not in a commit, pull request, or GitHub Release for this project
 - Not as a gist, issue attachment, or Actions artifact
@@ -30,7 +32,7 @@ Put a legally obtained original JAR on your machine. Extract resources into `ass
 
 Never open a pull request that adds:
 
-- `*.jar` / `*.jad` game packages
+- original game `*.jar` / `*.jad` packages (the host `bounce-tales-runtime.jar` at the repo root is allowed)
 - original `aa.png` … `av.png`, `*.mid`, `lang.*`, or packed level files (`be`–`bv`, resource map `a`)
 - decompiled dumps of HelloOO7/BounceTales
 
@@ -45,4 +47,4 @@ If we later reuse Wafer-EX code, record it in `NOTICE` and keep original assets 
 
 ## Distribution
 
-Shipping an APK/IPA that contains original Bounce Tales art, music, or story is not in scope. Public binaries from this project must use placeholder or original replacement assets unless a rights holder grants written permission.
+Shipping an APK/IPA that contains original Bounce Tales art, music, or story is not in scope. Public binaries from this project (including `bounce-tales-runtime.jar`) must not embed original game assets unless a rights holder grants written permission.
