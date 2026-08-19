@@ -67,7 +67,7 @@ tasks.register("checkDesktopJar") {
         val mainClass = readMainClass(committed)
         if (mainClass != "io.github.zh667.bouncetales.pc.DesktopRuntime") {
             throw GradleException(
-                "Committed bounce-tales-runtime.jar Main-Class is '$mainClass', expected DesktopRuntime. Do not commit the original game JAR."
+                "Committed bounce-tales-runtime.jar Main-Class is '$mainClass', expected DesktopRuntime. The root JAR must remain the host; the authorized game belongs in assets/."
             )
         }
     }

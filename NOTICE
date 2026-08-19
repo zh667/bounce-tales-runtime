@@ -8,6 +8,12 @@ Apache License 2.0 covers only original files in this repository.
 It does not license Bounce, Bounce Tales, original JAR contents, graphics,
 music, story text, or third-party decompiled sources.
 
+The original Bounce Tales JAR at assets/bounce-tales.jar (MIDlet version
+2.0.14, SHA-256 c8265a2f10b3c69c7c4c835f86c40f98f44a776a2911b04b88d47b1594d8f18d)
+is redistributed under authorization confirmed by the repository maintainer.
+It is not licensed under Apache License 2.0. All applicable third-party rights
+remain with their respective owners.
+
 Third-party study references (not vendored in this repository):
 
 - HelloOO7/BounceTales — no license file; treat as all rights reserved

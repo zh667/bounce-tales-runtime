@@ -16,7 +16,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 /**
- * Scans a user-supplied assets directory. CI tests must pass a temp dir, never original game files.
+ * Scans the bundled or user-selected assets directory. Unit tests should pass a temp directory.
  */
 public final class AssetLocator {
     private static final String BOUNCE_TALES = "bounce tales";

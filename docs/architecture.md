@@ -7,7 +7,7 @@ Do not merge HelloOO7/BounceTales and Wafer-EX/BounceTalesReversed into one git 
 This repo is a **MIDlet host**, not a remake:
 
 - `j2me-api` owns original package names the game already links against (`javax.microedition.*`, `com.nokia.mid.ui`).
-- `runtime-pc` loads the user JAR with a classloader, sets Nokia platform properties, and starts `MIDlet-1`.
+- `runtime-pc` loads the bundled game JAR with a classloader, sets Nokia platform properties, and starts `MIDlet-1`.
 - `game-logic` may still parse JAR catalogs / RLEF for debug tools. It must not import `javax.microedition.*`.
 - `runtime-android` owns the future APK host.
 
@@ -21,7 +21,7 @@ Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong 
 
 | Phase | Desktop | Phone |
 | --- | --- | --- |
-| Now | Host JAR in the repo root; load user JAR from `assets/` | Original JAR + J2ME Loader |
+| Now | Host JAR in the repo root; load the authorized game JAR from `assets/` | Original JAR + J2ME Loader |
 | Next | Fill missing MIDP/Nokia methods until menus and chapters run | Still JAR in J2ME Loader |
 | Later | Same host packaged as a desktop jar | Android Gradle APK that loads a user JAR |
 | Not now | — | iOS / IPA |
@@ -29,7 +29,7 @@ Bounce Tales used Nokia `DirectGraphics` and `DeviceControl`. Those APIs belong 
 ## Data flow
 
 ```text
-user JAR (local, gitignored `assets/`)
+authorized game JAR (`assets/bounce-tales.jar`)
     -> MidletManifest reads MIDlet-1
     -> URLClassLoader (parent = host, so javax.* come from j2me-api)
     -> microedition.platform = NokiaN73 (must match manifest Nokia-Platform: Nokia*)
@@ -51,6 +51,6 @@ Readable class structure, resource composer, Nokia S40 packaging, Jademula Windo
 
 Gradle desktop layout, original keyboard table, save/MIDI ideas. This repo’s keymap is a new implementation: arrows **and WASD**, Backspace for Back (not `2`), Q for Star. Do not copy their LCDUI shims.
 
-## What this repo must not become
+## Asset boundary
 
-A re-upload of either upstream tree, or a public dump of Nokia/Rovio assets (including the original game JAR).
+The approved original game JAR is tracked under the authorization documented in `LEGAL.md`. This repository must not become a re-upload of either upstream source tree or a public dump of additional, extracted, or unapproved Nokia/Rovio assets.
