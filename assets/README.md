@@ -1,14 +1,13 @@
 # assets
 
-Keep original Bounce Tales resources here on your machine only.
+This directory contains the authorized Bounce Tales game artifact used by the runtime.
 
-This directory is gitignored except for this README and `.gitkeep`.
+`bounce-tales.jar` is intentionally tracked. Other files in this directory are ignored unless explicitly approved and documented in `LEGAL.md`.
 
 ## Load a JAR
 
-1. Copy a legally obtained Bounce Tales `.jar` into this folder.
-2. Keep only one Bounce Tales package here (other `.jar` files make the loader ask you to choose).
-3. Double-click `..\bounce-tales-runtime.jar` (Java 17+), or run:
+1. Keep the bundled `bounce-tales.jar` in this folder.
+2. Double-click `..\bounce-tales-runtime.jar` (Java 17+), or run:
 
 ```powershell
 .\gradlew.bat :runtime-pc:run
@@ -20,11 +19,12 @@ Or point at another folder:
 .\gradlew.bat :runtime-pc:run --args="--assets D:\games\bounce"
 ```
 
-The window should start the original MIDlet. Git will not stage the original `.jar`. Do not upload that file to GitHub. The host JAR at the repo root is ours and is supposed to be public.
+The window should start the original MIDlet. The game JAR is tracked under the redistribution authorization described in `LEGAL.md`; the host JAR at the repo root is separately covered by Apache-2.0.
 
-Expected local inputs (do not commit):
+Untracked local inputs may include:
 
-- original `.jar`
 - composed sprites, MIDI, `lang.*`, and packed levels extracted by your own tools
 
-HelloOO7's BounceComposer can decompose a JAR you already have. Point it at a local copy; do not copy its output into a pull request.
+Do not replace `bounce-tales.jar` or commit extracted resources without maintainer approval and an update to `LEGAL.md`.
+
+HelloOO7's BounceComposer can decompose a JAR locally. Do not copy its output into a pull request unless it is separately approved.

@@ -14,15 +14,17 @@ local.properties
 .DS_Store
 Thumbs.db
 
-# Original game dumps. Never commit these.
+# Unapproved game dumps and extracted resources stay local.
 *.jad
 dump/
 original/
 assets/**
 !assets/README.md
 !assets/.gitkeep
+!assets/bounce-tales.jar
 
-# Keep the wrapper and the public host JAR only. Never commit the original game.
+# Keep the wrapper, the public host JAR, and the authorized game JAR.
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 !/bounce-tales-runtime.jar
+!assets/bounce-tales.jar

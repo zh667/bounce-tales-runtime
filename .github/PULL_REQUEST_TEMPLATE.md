@@ -20,7 +20,7 @@
 ## Test plan
 
 - [ ] `./gradlew test` (or `.\scripts\verify.ps1`)
-- [ ] No original JAR/assets in the diff
+- [ ] Any game asset change is authorized and documented in `LEGAL.md`
 
 ## Notes
 

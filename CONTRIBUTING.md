@@ -31,7 +31,7 @@ Do not commit on `main`.
 ## 3. Implement on the branch
 
 - Keep game rules in `game-logic`. Runtimes only host, render, and persist.
-- Do not add original JAR contents. See [LEGAL.md](LEGAL.md).
+- Do not replace the authorized `assets/bounce-tales.jar` or add other original game contents without maintainer approval. See [LEGAL.md](LEGAL.md).
 - Tests belong with the module they protect.
 - Update docs when commands, layout, or workflow change.
 
@@ -53,4 +53,4 @@ Do not commit on `main`.
 - Force-push `main`
 - Bypass the pull request
 - Vendor HelloOO7 sources
-- Commit secrets, API keys, or game dumps
+- Commit secrets, API keys, or unapproved game dumps

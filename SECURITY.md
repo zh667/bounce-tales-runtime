@@ -8,6 +8,6 @@ Please include:
 
 - affected module and commit
 - impact
-- reproduction without attaching original game files
+- reproduction without attaching additional unapproved third-party game files
 
-Original Bounce Tales packages must not be uploaded as issue attachments.
+Use the tracked `assets/bounce-tales.jar` when a reproduction needs the approved game build. Do not upload other game packages as issue attachments without maintainer approval.

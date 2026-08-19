@@ -1,10 +1,10 @@
 # bounce-tales-runtime
 
-Unofficial **MIDlet host** for a legally obtained Bounce Tales JAR. Desktop now; Android APK later.
+Unofficial **MIDlet host** for Bounce Tales. Desktop now; Android APK later.
 
-This repository is **not** Bounce Tales, not a Nokia/Rovio product, and does not ship original game assets. You must supply a legally obtained original JAR locally. See [LEGAL.md](LEGAL.md).
+This repository is not an official Nokia/Rovio product. It includes an authorized copy of the original game JAR at `assets/bounce-tales.jar`; that artifact is distributed separately from the Apache-2.0 host code. See [LEGAL.md](LEGAL.md).
 
-Current status: clone this repo, drop a legally obtained original JAR into `assets/`, and double-click the committed `bounce-tales-runtime.jar` (Java 17+). The host never embeds the original game.
+Current status: clone this repo and double-click the committed `bounce-tales-runtime.jar` (Java 17+). The host loads the bundled game from `assets/` and does not embed it in the host JAR.
 
 ## Goals
 
@@ -23,7 +23,7 @@ game-logic/        JAR catalog and optional debug overlay parsers
 runtime-pc/        desktop host (classloader + 240×320 window, scaled 2×)
 runtime-android/   APK host later; JVM stub for now
 bounce-tales-runtime.jar  host fat JAR (no original game)
-assets/            local original JAR only; gitignored
+assets/            authorized original game JAR
 docs/              architecture, roadmap, contributor rules
 ```
 
@@ -36,17 +36,16 @@ Java 26 can compile the skeleton with `--release 17`, but CI and `./gradlew` are
 
 ## Play after clone
 
-The repository includes the **host** JAR (`bounce-tales-runtime.jar`). It does not include Bounce Tales.
+The repository includes both the Apache-2.0 **host** JAR (`bounce-tales-runtime.jar`) and the separately authorized game JAR (`assets/bounce-tales.jar`).
 
 1. Install Java 17 or newer (double-click needs `javaw` associated with `.jar`).
-2. Copy a legally obtained Bounce Tales `.jar` into `assets/` (gitignored; do not commit it).
-3. Double-click `bounce-tales-runtime.jar` in the repo root.
+2. Double-click `bounce-tales-runtime.jar` in the repo root.
 
 ```text
 bounce-tales-runtime/
   bounce-tales-runtime.jar   ← host (this repo)
   assets/
-    bounce-tales.jar         ← your original game (local only)
+    bounce-tales.jar         ← authorized bundled game
 ```
 
 If double-click does nothing:

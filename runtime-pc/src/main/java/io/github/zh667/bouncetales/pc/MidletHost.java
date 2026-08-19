@@ -12,7 +12,7 @@ import javax.microedition.midlet.MIDletBridge;
 import javax.swing.SwingUtilities;
 
 /**
- * Loads a user-supplied Bounce Tales JAR and starts its MIDlet. Original game classes stay in the JAR.
+ * Loads the bundled or user-selected Bounce Tales JAR and starts its MIDlet. Original game classes stay in the JAR.
  */
 public final class MidletHost {
     private MidletHost() {}

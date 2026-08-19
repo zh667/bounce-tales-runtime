@@ -6,5 +6,5 @@
 - Public Java types live under `io.github.zh667.bouncetales.*`, except `j2me-api` which must use original `javax.microedition.*` and `com.nokia.mid.*` names.
 - Commands that CI runs must work on Windows and Ubuntu.
 - If a Gradle task is a no-op, say so in README. Do not fake a green build.
-- Original assets stay in gitignored `assets/`.
+- The approved `assets/bounce-tales.jar` is tracked. Other original assets stay ignored unless maintainer-approved and documented in `LEGAL.md`.
 - Small diffs: feature, refactor, and formatting in separate commits when practical.

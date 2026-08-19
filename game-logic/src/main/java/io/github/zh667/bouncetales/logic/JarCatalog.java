@@ -12,7 +12,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * Names of media entries inside a user-supplied JAR. Does not keep image or MIDI bytes.
+ * Names of media entries inside a bundled or user-selected JAR. Does not keep image or MIDI bytes.
  */
 public final class JarCatalog {
     private final Path jar;
